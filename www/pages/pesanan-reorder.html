@@ -1,0 +1,55 @@
+<template>
+  <div class="page" data-name="reorder">
+    <div class="navbar" style="height: 50px;
+    position: fixed;
+    top: 200;
+    width: 100%;
+    ">
+    <div class="navbar-inner sliding">
+      <div class="left">
+        <a href="#" onclick="testEmpty()" class="link back">
+          <i class="icon icon-back"></i>
+          <span class="ios-only">Back</span>
+        </a>
+          <!-- <a href="#" class="link icon-only panel-open" data-panel="left">
+            <i class="icon f7-icons ios-only">menu</i>
+            <i class="icon material-icons md-only">menu</i>
+          </a> -->
+        </div>
+        <div class="title">New Order</div>
+      </div>
+    </div>
+    <div class="page-content" style="padding-top: 27px; padding-bottom: 35px; overflow-y: hidden">
+      <div class="block">
+        <div class="row">
+          <div class="col-70 grid-demo">
+           <div class="row" id="menuku" style=" overflow:scroll;max-height: calc( 90vh - 50px );justify-content: normal;"></div>
+         </div>
+         <div class="col-30">
+           <div class="segmented">
+            <!-- <button class="button" onclick="meja(0)">Meja</button> -->
+             <button class="button" onclick="ordernya()">Order</button>
+           </div>
+           <div class="list no-hairlines-between" style=" overflow:scroll;height: calc( 60vh - 50px );margin:1px;">
+             <ul id="keranjang">
+
+             </ul>
+           </div>
+           <div class="row"> 
+            <div class="col-50 tablet-50">SubTotal</div>
+            <div class="col-50 tablet-50" id="subtotal" style="text-align: right">0</div>
+          </div>
+          <div class="row"> 
+            <div class="col-50 tablet-50">PPn</div>
+            <div class="col-50 tablet-50" id="ppn" style="text-align: right">0</div>
+          </div>
+          <div class="row"> 
+            <div class="col-50 tablet-50">GrandTotal</div>
+            <div class="col-50 tablet-50" id="grandtotal" style="text-align: right">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>

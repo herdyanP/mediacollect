@@ -1,0 +1,187 @@
+<template>
+  <div class="page" data-name="pesanan">
+    <div class="navbar" style="height: 50px;
+    position: fixed;
+    top: 200;
+    width: 100%;
+    ">
+    <div class="navbar-inner sliding">
+      <div class="left">
+        <a href="#" onclick="testEmpty()" class="link back">
+          <i class="icon icon-back"></i>
+          <span class="ios-only">Back</span>
+        </a>
+          <!-- <a href="#" class="link icon-only panel-open" data-panel="left">
+            <i class="icon f7-icons ios-only">menu</i>
+            <i class="icon material-icons md-only">menu</i>
+          </a> -->
+        </div>
+        <div class="title">Pesanan</div>
+      </div>
+    </div>
+    <div class="page-content" style="padding-top: 27px; padding-bottom: 35px; overflow-y: hidden">
+      <div class="block">
+        <div class="row">
+          <div class="col-70 grid-demo">
+           <div class="row" id="menuku" style=" overflow-y:scroll;max-height: calc( 90vh - 50px );justify-content: normal;"></div>
+         </div>
+         <div class="col-30">
+           <div class="segmented">
+            <button class="button" onclick="meja(0)">Meja</button>
+            <button class="button" onclick="ordernya()">Order</button>
+           </div>
+           <div class="list no-hairlines-between" style=" overflow-y:scroll;height: calc( 60vh - 50px );margin:1px;">
+             <ul id="keranjang">
+
+             </ul>
+           </div>
+           <div class="row"> 
+            <div class="col-50 tablet-50">SubTotal</div>
+            <div class="col-50 tablet-50" id="subtotal" style="text-align: right">0</div>
+          </div>
+          <div class="row"> 
+            <div class="col-50 tablet-50">PPn</div>
+            <div class="col-50 tablet-50" id="ppn" style="text-align: right">0</div>
+          </div>
+          <div class="row"> 
+            <div class="col-50 tablet-50">GrandTotal</div>
+            <div class="col-50 tablet-50" id="grandtotal" style="text-align: right">0</div>
+          </div>
+        </div>
+      </div>
+      <!-- <a href="#" onclick="testVacuum()">TRY ME!</a> -->
+    </div>
+  </div>
+</div>
+</template>
+<script>
+  return {
+    methods: {
+      showToastBottom: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastBottom) {
+          self.toastBottom = self.$app.toast.create({
+            text: 'This is default bottom positioned toast',
+            closeTimeout: 2000,
+          });
+        }
+        // Open it
+        self.toastBottom.open();
+      },
+      showToastTop: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastTop) {
+          self.toastTop = self.$app.toast.create({
+            text: 'Top positioned toast',
+            position: 'top',
+            closeTimeout: 2000,
+          });
+        }
+        // Open it
+        self.toastTop.open();
+      },
+      showToastCenter: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastCenter) {
+          self.toastCenter = self.$app.toast.create({
+            text: 'I\'m on center',
+            position: 'center',
+            closeTimeout: 2000,
+          });
+        }
+        // Open it
+        self.toastCenter.open();
+      },
+      showToastIcon: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastIcon) {
+          self.toastIcon = self.$app.toast.create({
+            icon: self.$theme.ios ? '<i class="f7-icons">star</i>' : '<i class="material-icons">star</i>',
+            text: 'I\'m with icon',
+            position: 'center',
+            closeTimeout: 2000,
+          });
+        }
+        // Open it
+        self.toastIcon.open();
+      },
+      showToastLargeMessage: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastLargeMessage) {
+          self.toastLargeMessage = self.$app.toast.create({
+            text: 'This toast contains a lot of text. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil, quae, ab. Delectus amet optio facere autem sapiente quisquam beatae culpa dolore.',
+            closeTimeout: 2000,
+          });
+        }
+        // Open it
+        self.toastLargeMessage.open();
+      },
+      showToastWithButton: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastWithButton) {
+          self.toastWithButton = self.$app.toast.create({
+            text: 'Toast with additional close button',
+            closeButton: true,
+          });
+        }
+        // Open it
+        self.toastWithButton.open();
+      },
+      showToastWithCustomButton: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastWithCustomButton) {
+          self.toastWithCustomButton = self.$app.toast.create({
+            text: 'Custom close button',
+            closeButton: true,
+            closeButtonText: 'Close Me',
+            closeButtonColor: 'red',
+          });
+        }
+        // Open it
+        self.toastWithCustomButton.open();
+      },
+      showToastWithCallback: function () {
+        var self = this;
+        // Create toast
+        if (!self.toastWithCallback) {
+          self.toastWithCallback = self.$app.toast.create({
+            text: 'Callback on close',
+            closeButton: true,
+            on: {
+              close: function () {
+                self.$app.dialog.alert('Toast closed');
+              },
+            }
+          });
+        }
+        // Open it
+        self.toastWithCallback.open();
+      },
+    },
+    on: {
+      pageBeforeOut: function () {
+        var self = this;
+        self.$app.toast.close();
+      },
+      pageBeforeRemove: function () {
+        var self = this;
+        // Destroy toasts when page removed
+        if (self.toastBottom) self.toastBottom.destroy();
+        if (self.toastTop) self.toastTop.destroy();
+        if (self.toastCenter) self.toastCenter.destroy();
+        if (self.toastIcon) self.toastIcon.destroy();
+        if (self.toastLargeMessage) self.toastLargeMessage.destroy();
+        if (self.toastWithButton) self.toastWithButton.destroy();
+        if (self.toastWithCustomButton) self.toastWithCustomButton.destroy();
+        if (self.toastWithCallback) self.toastWithCallback.destroy();
+      },
+    }
+  }
+</script>

@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">
+          Tambah/Edit Satuan
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="block">
+        <input type="hidden" id="id_satuan">
+        <form id="satuan_form" class="list no-hairlines no-hairlines-between">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Nama Satuan</div>
+                <div class="item-input-wrap">
+                  <input type="text" name="nama_satuan" id="nama_satuan">
+                </div>
+              </div>
+            </li>
+            <li class="item-content">
+              <div class="item-inner">
+                <div class="item-title"  style="width: 100%;">
+                  <a class="button button-outline" id="button_addSatuan" style="display: block;" onclick="addSatuan(document.getElementById('satuan_form'));">Tambah</a>
+                  <p class="row" id="buttons_editSatuan" style="display: none;">
+                    <a class="col button button-outline" onclick="hideEditSatuan(document.getElementById('satuan_form'));">Batal</a>
+                    <a class="col button button-outline" onclick="editSatuan(document.getElementById('satuan_form'))">Update</a>
+                  </p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </form>
+        <!-- <div class="segmented" style="margin: 5px;">
+          <a href="#addFoods" class="button tab-link tab-link-active">Foods</a>
+          <a href="#addBvrgs" class="button tab-link">Beverages</a>
+          <a href="#addCombos" class="button tab-link">Combos</a>
+        </div> -->
+      </div>
+
+      <div class="card card-outline">
+        <div class="card-header">
+          <strong>Satuan Tersedia</strong>
+        </div>
+
+        <div class="block" style="max-height: 60vh; overflow: scroll;">
+          <div class="list no-hairlines" id="satuan_list">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

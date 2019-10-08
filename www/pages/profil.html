@@ -1,0 +1,110 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">
+          Edit Profil
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <form class="list no-hairlines no-hairlines-between" id="profil_cred">
+        <ul>
+
+          <div class="block-header"><h3>Informasi Akun</h3></div>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Email</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_email" name="email">
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Username</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_user" name="user" readonly>
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Password Baru</div>
+              <div class="item-input-wrap">
+                <input type="password" id="pass1" name="pass1">
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Ulangi Password Baru</div>
+              <div class="item-input-wrap">
+                <input type="password" id="pass2" name="pass2">
+              </div>
+            </div>
+          </li>
+
+          <div class="block-header"><h3>Informasi Pribadi</h3></div>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Nama Lengkap</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_nama_lengkap" name="nama_lengkap">
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Nomor Telepon</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_notel" name="notel">
+              </div>
+            </div>
+          </li>
+
+          <div class="block-header"><h3>Informasi Toko / Outlet</h3></div>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Nama Toko / Outlet</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_nama_outlet" name="nama_outlet">
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Alamat</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_alamat_outlet" name="alamat_outlet">
+              </div>
+            </div>
+          </li>
+          <li class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Nomor Telepon</div>
+              <div class="item-input-wrap">
+                <input type="text" id="p_telp_outlet" name="telp_outlet">
+              </div>
+            </div>
+          </li>
+
+          <li class="item-content">
+            <div class="item-inner">
+              <div class="item-title" style="width: 100%;">
+                <a id="" class="button button-fill" href="#" onclick="updateProfil();">Update Profile</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </form>
+    </div>
+  </div>
+</template>

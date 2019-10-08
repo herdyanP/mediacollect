@@ -1,0 +1,120 @@
+<template>
+  <div class="page" data-name="register">
+    <div class="page-content login-screen-content">
+      <div class="login-screen-title" style="font-size: 28px">Register Baru
+        <!-- <div class="mt-20"><img src="logo.png" width="150" height="150"></div> -->
+        <!-- <div style="font-size: 22px">Login Anggota</div> -->
+      </div>
+
+      <form id="register_cred" autocomplete="off">
+        <div class="list no-hairlines no-hairlines-between">
+          <ul>
+
+            <li class="item-divider">Informasi Akun</li>
+            <br>
+
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Email</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="email">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Username</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="user">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Password</div>
+                <div class="item-input-wrap">
+                  <input type="password" id="" name="pass">
+                </div>
+              </div>
+            </li>
+
+            <li class="item-divider">Informasi Pribadi</li>
+            <br>
+
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Nama Lengkap</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="nama_lengkap">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Nomor Telepon</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="notel">
+                </div>
+              </div>
+            </li>
+
+            <li class="item-divider">Informasi Toko / Outlet</li>
+            <br>
+
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Nama Toko / Outlet</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="namaout">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Alamat</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="alamout">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Nomor Telepon</div>
+                <div class="item-input-wrap">
+                  <input type="text" id="" name="telout">
+                </div>
+              </div>
+            </li>
+            
+            <li class="item-content">
+              <div class="item-inner">
+                <div class="item-title" style="width: 100%;">
+                  <a id="register_button" class="button button-outline button-round" href="#" onclick="register(document.getElementById('register_cred'))">Register</a>
+                </div>
+              </div>
+            </li>
+            <!-- <li class="item-content">
+              <div class="item-inner">
+                <div class="item-title" style="width: 100%;" align="center">
+                  <div class="row">
+                    <a href="/lupapassword/" class="button button-small col"><b>Lupa Password</b></a>
+                    <a href="#" class="button button-small col"><b>Daftar Baru</b></a>
+                  </div>
+                </div>
+              </div>
+            </li> -->
+          </ul>
+        </div>
+
+        <!-- <a href="#" onclick="onLogout()">LO</a> -->
+        <!-- <a href="#" onclick="onLogin()">LI</a> -->
+
+        <div class="block-footer">
+          <p><a href="/login/">Kembali ke halaman Login</a></p>
+          <p>&copy; 2019 PT Media Nusa Mandiri</p>
+          <p id="appversion_r"></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>

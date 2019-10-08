@@ -1,0 +1,65 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">
+          Laporan Penjualan 
+        </div>
+      </div>
+      <!-- <div class="subnavbar">
+        <div class="subnavbar-inner">
+          <div class="segmented">
+            <a href="#jual1" class="button tab-link tab-link-active">Item</a>
+            <a href="#beverages" class="button tab-link">Beverages</a>
+            <a href="#combos" class="button tab-link">Combos</a>
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <div class="page-content">
+      <div class="card card-outline">
+        <div class="card-header">
+          <strong>Laporan</strong>
+        </div>
+
+        <div class="list no-hairlines no-hairlines-between">
+          <ul>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Tanggal Awal</div>
+                <div class="item-input-wrap">
+                  <input type="date" id="tgl_awal">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input">
+              <div class="item-inner">
+                <div class="item-title item-label">Tanggal Akhir</div>
+                <div class="item-input-wrap">
+                  <input type="date" id="tgl_akhir">
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-footer">
+          <button class="button button-fill color-green" onclick="laporanPenjualan()">Cari</button>
+        </div>
+      </div>
+
+      <div class="data-table" id="table_penjualan">
+        
+      </div>
+
+
+    </div>
+  </div>
+</template>

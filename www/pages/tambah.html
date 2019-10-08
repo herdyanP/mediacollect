@@ -1,0 +1,99 @@
+<template>
+  <div class="page">
+
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">
+          Tambah/Edit Menu
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="block">
+        <input type="hidden" id="id_barang">
+        <form id="barang_form" class="list no-hairlines no-hairlines-between">
+          <ul>
+            <li class="item-content item-input ">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Tipe</div>
+                <div class="item-input-wrap input-dropdown-wrap">
+                  <select id="tipe_barang" name="tipe_barang">
+                    <option value="" selected disabled>-- Pilih Tipe --</option>
+                    <option value="1">Food</option>
+                    <option value="2">Beverage</option>
+                    <option value="3">Appetizer</option>
+                    <option value="4">Desert</option>
+                  </select>
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input ">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Kode Item</div>
+                <div class="item-input-wrap">
+                  <input type="text" name="kode_barang" id="kode_barang">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input ">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Nama Item</div>
+                <div class="item-input-wrap">
+                  <input type="text" name="nama_barang" id="nama_barang">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input ">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Harga per Satuan</div>
+                <div class="item-input-wrap">
+                  <input type="number" name="harga" id="harga_addItem">
+                </div>
+              </div>
+            </li>
+            <li class="item-content item-input ">
+              <div class="item-inner">
+                <div class="item-title item-label" style="color: unset;">Satuan</div>
+                <div class="item-input-wrap input-dropdown-wrap">
+                  <select id="satuan_select" name="id_satuan">
+                    <option value="" selected="" disabled="">-- Pilih Satuan --</option>
+                  </select>
+                </div>
+              </div>
+            </li>
+            <!-- <input type="hidden" name="act" id="act" value=""> -->
+            <li class="item-content">
+              <div class="item-inner">
+                <div class="item-title"  style="width: 100%;">
+                  <a class="button button-outline" id="button_addItem" style="display: block;" onclick="addBarang(document.getElementById('barang_form'));">Tambah</a>
+                  <p class="row" id="buttons_editRemove" style="display: none;">
+                    <a class="col button button-outline" onclick="hideEditBarang(document.getElementById('barang_form'));">Batal</a>
+                    <a class="col button button-outline" onclick="editBarang(document.getElementById('barang_form'))">Update</a>
+                  </p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </form>        
+      </div>
+
+      <div class="card card-outline">
+        <div class="card-header">
+          <strong>Barang Tersedia</strong>
+        </div>
+
+        <div class="block" style="max-height: 60vh; overflow: scroll;">
+          <div class="list no-hairlines" id="barang_list">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
