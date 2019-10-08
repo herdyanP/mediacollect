@@ -4,7 +4,7 @@
 
 // Init App
 var app = new Framework7({
-  id: 'com.medianusamandiri.LightPOS',
+  id: 'com.medianusamandiri.collectionapp',
   root: '#app',
   init: false,
   // theme: theme,
@@ -17,4 +17,22 @@ document.addEventListener('deviceready', function() {
 
 function onNewLogin(form){
   app.views.main.router.navigate('/home/');
+}
+
+function cekCIF(src, event, value){
+  if ( (window.event ? event.keyCode : e.which) == 13) { 
+    switch(src){
+      case "cif":
+        console.log('cif', value);
+        break;
+
+      case "coll_s":
+        console.log('coll_s', value);
+        break;
+
+      case "coll_a":
+        console.log('coll_a', value);
+        break;
+    }
+  }
 }

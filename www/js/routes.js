@@ -16,9 +16,14 @@ var routes =
     name: 'cif'
   },
   {
-    path: '/coll/',
-    componentUrl: './pages/coll.html',
-    name: 'coll'
+    path: '/coll_simpanan/',
+    componentUrl: './pages/coll_simpanan.html',
+    name: 'coll_simpanan'
+  },
+  {
+    path: '/coll_angsuran/',
+    componentUrl: './pages/coll_angsuran.html',
+    name: 'coll_angsuran'
   },
   {
     path: '/report/',
