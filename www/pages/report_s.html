@@ -1,0 +1,48 @@
+<template>
+	<div class="page" data-name="report_saving">
+		<div class="navbar">
+			<div class="navbar-inner">
+				<div class="left">
+					<a href="#" class="link icon-only panel-open" data-panel="left">
+		                <i class="f7-icons md-only">menu</i>
+		                <span class="ios-only">Menu</span>
+		              </a>
+				</div>
+				<div class="title" id="report_title">Laporan Rekap Saving</div>
+			</div>
+		</div>
+
+		<div class="page-content">
+			<div class="card">
+				<div class="card-content">
+					<div class="list no-hairlines no-hairlines-between">
+						<ul>
+							<li class="item-content item-input">
+								<div class="item-inner">
+									<div class="item-title item-label" style="color: unset;">Tanggal Awal</div>
+									<div class="item-input-wrap">
+										<input type="date" id="tgl_awal" name="tgl_awal">
+									</div>
+								</div>
+							</li>
+							<li class="item-content item-input">
+								<div class="item-inner">
+									<div class="item-title item-label" style="color: unset;">Tanggal Akhir</div>
+									<div class="item-input-wrap">
+										<input type="date" id="tgl_akhir" name="tgl_akhir">
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="card-footer">
+					<a href="" class="button button-fill" style="width: 100%;" onclick="laporanReport();">Tampilkan</a>
+				</div>
+			</div>
+
+			<div class="block" id="result_s">
+			</div>
+		</div>
+	</div>
+</template>
