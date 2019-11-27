@@ -304,5 +304,128 @@ var routes =
         $('#preview_printer').html(to_be_previewed);
       }
     }
+  },
+  {
+    path: '/profil/',
+    name: 'profil',
+    template: '\
+      <div class="page" data-name="profile">\
+        <div class="navbar">\
+          <div class="navbar-inner">\
+            <div class="left">\
+              <a href="#" class="link icon-only panel-open" data-panel="left">\
+                <i class="f7-icons md-only">menu</i>\
+                <span class="ios-only">Menu</span>\
+              </a>\
+            </div>\
+            <div class="title">Profil User</div>\
+          </div>\
+        </div>\
+        <div class="page-content">\
+          <div class="block" id="profil">\
+          </div>\
+        </div>\
+      </div>',
+    on: {
+      pageAfterIn: function(){
+        var temp = {
+          id_user : iduser
+        };
+
+        $.ajax({
+          url: site+"/API/profil/",
+          method: "POST",
+          data: JSON.stringify(temp),
+          success: function(result){
+            var datanya = '<div class="list no-hairlines">\
+                            <ul>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Nama Pegawai</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].nama_pegawai+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">User ID</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].USERNAME+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">NIK</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].nik+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Tempat Lahir</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].tmp_lahir+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Tanggal Lahir</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].tgl_lahir+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Alamat</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name=""  readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Telp</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].nohp+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Email</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].email+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Cabang</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name="" value="'+result[0].id_cabang+'" readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Keterangan</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="text" id="" name=""  readonly>\
+                                  </div>\
+                                </div>\
+                              </li>\
+                            </ul>\
+                          </div>';
+
+            $('#profil').html(datanya);
+          }
+        })
+      }
+    }
   }
 ];
