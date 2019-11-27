@@ -48,7 +48,7 @@ var routes =
               data: JSON.stringify(temp),
               success: function(result){
                 for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
                 }
 
                 autoc.preloaderHide();
@@ -75,6 +75,7 @@ var routes =
           inputEl: '#input_colls',
           openIn: 'dropdown',
           preloader: true,
+          expandInput: true,
           limit: 10,
           source: function(query, render){
             var autoc = this;
@@ -100,7 +101,8 @@ var routes =
               data: JSON.stringify(temp),
               success: function(result){
                 for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                  // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
                 }
 
                 autoc.preloaderHide();
@@ -110,6 +112,7 @@ var routes =
           },
           on: {
             change: function(value){
+              console.log(value);
               cekCIF('coll_s', value[0].split(' - ')[0])
             }
           }
@@ -270,6 +273,10 @@ var routes =
           }
 
         })
+      },
+      pageInit: function(){
+        idx = [];
+        po_simpanan = [];
       }
     }
   },

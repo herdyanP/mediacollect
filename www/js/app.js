@@ -1,6 +1,6 @@
 // Dom7
-// sudo cordova build android --release -- --keystore=lightpos.keystore --storePassword=bismillah --alias=lightpos --password=bismillah
-// C:\Program Files\Java\jre1.8.0_221\bin>keytool -genkey -v -keystore sisco.keystore -alias sisco -keyalg RSA -keysize 2048 -validity 10000
+// sudo cordova build android --release -- --keystore=mcoll.keystore --storePassword=bismillah --alias=mcoll --password=bismillah
+// C:\Program Files\Java\jre1.8.0_221\bin>keytool -genkey -v -keystore mcoll.keystore -alias mcoll -keyalg RSA -keysize 2048 -validity 10000
 
 // Init App
 var app = new Framework7({
@@ -15,6 +15,8 @@ document.addEventListener('deviceready', function() {
   app.init();
 
   document.addEventListener("backbutton", onBackPressed, false);
+  document.addEventListener("touchend", onTouchEnd, false);
+  document.addEventListener("touchstart", onTouchStart, false);
 });
 
 var site = 'http://mcollection.cloudmnm.com';
@@ -27,6 +29,10 @@ var po_simpanan = [];
 var jenis_laporan = '';
 var to_be_printed = '';
 var to_be_previewed = '';
+var timeout_dur = 0;
+var logout_timer = '';
+var session_token = '';
+var session_checker = '';
 
 function onNewLogin(form){
   var temp = {};
@@ -42,7 +48,15 @@ function onNewLogin(form){
     success: function(result){
       if(result.length > 0){
         iduser = result[0].USERNAME;
-        app.views.main.router.navigate('/cif/');
+        timeout_dur = result[0].timeout;
+        session_token = result[0].token;
+        logout_timer = setTimeout(function(){
+         // alert("Hello");
+         onLogout(1);
+        }, timeout_dur * 1000 * 60);
+
+        app.views.main.router.navigate('/coll_simpanan/');
+        cekSession();
       } else {
         app.toast.create({
           text: "Cek lagi username / password anda",
@@ -54,99 +68,148 @@ function onNewLogin(form){
   })
 }
 
+function onLogout(t){
+  timeout_dur = 0;
+  iduser = '';
+  clearTimeout(session_checker);
+  app.views.main.router.navigate('/');
+  
+  switch(t){
+    case 0:
+      app.toast.create({
+        text: "Berhasil Logout",
+        closeTimeout: 3000,
+        closeButton: true
+      }).open();
+      break;
+
+    case 1:
+      app.toast.create({
+        text: "Anda Telah Logout Secara Otomatis Karena Tidak Ada Aktivitas",
+        closeTimeout: 10000,
+        closeButton: true
+      }).open();
+      break;
+
+    case 2:
+      app.toast.create({
+        text: "Anda Telah Login Di Perangkat Lain",
+        closeTimeout: 3000,
+        closeButton: true
+      }).open();
+      break;
+
+    case 3:
+      app.toast.create({
+        text: "Anda Telah Logout Secara Otomatis Karena Terputus Dari Jaringan",
+        closeTimeout: 10000,
+        closeButton: true
+      }).open();
+      break;
+  }
+}
+
 function cekCIF(src, cif){
   var tabel = '';
   var dt1 = '';
-  $.ajax({
-    url: site+'/API/CIF/'+cif+'/',
-    method: 'GET',
-    success: function(result){
-      tabel = '<table style="width: 100%; padding-left: 16px;">\
-          <tr>\
-            <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
-          </tr>\
-          <tr>\
-            <td width="15%"><b>CIF</b></td>\
-            <td width="5%"><b>:</b></td>\
-            <td width="80%"><b>'+result[0].CIF+'</b></td>\
-          </tr>\
-          <tr>\
-            <td width="15%"><b>Nama</b></td>\
-            <td width="5%"><b>:</b></td>\
-            <td width="80%"><b>'+result[0].SSNAMA+'</b></td>\
-          </tr>\
-          <tr>\
-            <td width="15%"><b>Alamat</b></td>\
-            <td width="5%"><b>:</b></td>\
-            <td width="80%"><b>'+result[0].SSALAMAT+'</b></td>\
-          </tr>\
-        </table>\
-      ';
+  if(cif != ''){
+    $.ajax({
+      url: site+'/API/CIF/'+cif+'/',
+      method: 'GET',
+      success: function(result){
+        tabel = '<table style="width: 100%; padding-left: 16px;">\
+            <tr>\
+              <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
+            </tr>\
+            <tr>\
+              <td width="15%"><b>CIF</b></td>\
+              <td width="5%"><b>:</b></td>\
+              <td width="80%"><b>'+result[0].CIF+'</b></td>\
+            </tr>\
+            <tr>\
+              <td width="15%"><b>Nama</b></td>\
+              <td width="5%"><b>:</b></td>\
+              <td width="80%"><b>'+result[0].SSNAMA+'</b></td>\
+            </tr>\
+            <tr>\
+              <td width="15%"><b>Alamat</b></td>\
+              <td width="5%"><b>:</b></td>\
+              <td width="80%"><b>'+result[0].SSALAMAT+'</b></td>\
+            </tr>\
+          </table>\
+        ';
 
-      switch(src){
-        case "cif":
-          dt1 = '<table>\
-              <thead>\
-                <tr>\
-                  <th class="label-cell">Rekening</th>\
-                  <th >Produk</th>\
-                  <th class="numeric-cell">Saldo</th>\
-                </tr>\
-              </thead>\
-              <tbody>\
-          ';
-
-          for(var i = 0; i < result.length; i++){
-            dt1 += '<tr>\
-                      <td class="label-cell">'+result[i].SSREK+'</td>\
-                      <td >'+result[i].jpinjaman+'</td>\
-                      <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
-                    </tr>\
-            ';
-          }
-
-          dt1 += '</tbody>\
-                </table>\
+        switch(src){
+          case "cif":
+            dt1 = '<table>\
+                <thead>\
+                  <tr>\
+                    <th class="label-cell">Rekening</th>\
+                    <th >Produk</th>\
+                    <th class="numeric-cell">Saldo</th>\
+                  </tr>\
+                </thead>\
+                <tbody>\
             ';
 
-          $('#rekening_cif').html(dt1);
-          $('#detil_cif').html(tabel);
-          break;
+            for(var i = 0; i < result.length; i++){
+              dt1 += '<tr>\
+                        <td class="label-cell">'+result[i].SSREK+'</td>\
+                        <td >'+result[i].jpinjaman+'</td>\
+                        <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
+                      </tr>\
+              ';
+            }
 
-        case "coll_s":
-          dt1 = '<table>\
-              <thead>\
-                  <th class="label-cell">Rekening</th>\
-                  <th >Produk</th>\
-                  <th></th>\
-                </tr>\
-              </thead>\
-              <tbody>\
-          ';
+            dt1 += '</tbody>\
+                  </table>\
+              ';
 
-          for(var i = 0; i < result.length; i++){
-            dt1 += '<tr>\
-                      <td class="label-cell">'+result[i].SSREK+'</td>\
-                      <td >'+result[i].jpinjaman+'</td>\
-                      <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\')">Proses</a></td>\
-                    </tr>\
+            $('#rekening_cif').html(dt1);
+            $('#detil_cif').html(tabel);
+            break;
+
+          case "coll_s":
+            dt1 = '<table>\
+                <thead>\
+                    <th class="label-cell">Rekening</th>\
+                    <th>Produk</th>\
+                    <th class="numeric-cell">Saldo</th>\
+                    <th>Update Terakhir</th>\
+                    <th>Status</th>\
+                    <th></th>\
+                  </tr>\
+                </thead>\
+                <tbody>\
             ';
-          }
 
-          dt1 += '</tbody>\
-                </table>\
-            ';
+            for(var i = 0; i < result.length; i++){
+              dt1 += '<tr>\
+                        <td class="label-cell">'+result[i].SSREK+'</td>\
+                        <td>'+result[i].jpinjaman+'</td>\
+                        <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
+                        <td>'+result[i].SSTGL+'</td>\
+                        <td>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</td>\
+                        <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\')">Proses</a></td>\
+                      </tr>\
+              ';
+            }
 
-          $('#rekening_colls').html(dt1);
-          $('#detil_colls').html(tabel);
-          break;
+            dt1 += '</tbody>\
+                  </table>\
+              ';
 
-        case "coll_a":
-          $('#detil_colla').html(tabel);
-          break;
+            $('#rekening_colls').html(dt1);
+            $('#detil_colls').html(tabel);
+            break;
+
+          case "coll_a":
+            $('#detil_colla').html(tabel);
+            break;
+        }
       }
-    }
-  })
+    });
+  }
 }
 
 function proses(jenis, cif, rek, nama, sal){
@@ -259,15 +322,17 @@ function printSetoran(temp){
       var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
 
       var cetakan = 'Berhasil';
+      var head_unik = "{left}-{br}";
       var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
+      var separator_unik = "-- -------------------------- --{br}";
       var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
       var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
       var thanks = "{center}- Terima Kasih -{br}";
       var eol = "{br}{br}{br}";
 
-      cetakan = kop + separator + detil + separator + setor + separator + thanks + eol;
+      cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
 
       window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
         $.ajax({
@@ -301,6 +366,7 @@ function posting(){
   var tot_posting = tot_simpanan + tot_pinjaman;
   var temp = {
     jenis_print : "posting",
+    act : "posting",
     user : iduser,
     simpanan : tot_simpanan,
     pinjaman : tot_pinjaman,
@@ -382,8 +448,10 @@ function printPosting(temp){
       var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
 
       var cetakan = 'Berhasil';
+      var head_unik = "{left}-{br}";
       var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
+      var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
       var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
@@ -397,14 +465,14 @@ function printPosting(temp){
         jeni_detil += po_simpanan[i].cif + "   " + po_simpanan[i].rek + "   " + lpad(po_simpanan[i].nominal.toLocaleString("id-ID"), 10, ' ') + "{br}";
       }
 
-      cetakan = kop + separator + post + separator + jeni + jeni_detil + separator + thanks + eol;
+      cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
 
       window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
         for(var i = 0; i < idx.length; i++){
           var upd = {
             act : "update",
             idx : idx[i]
-          }
+          };
 
           $.ajax({
             url: site+"/API/setoran/",
@@ -420,15 +488,32 @@ function printPosting(temp){
           url: site+"/API/posting/",
           method: "POST",
           data: JSON.stringify(temp),
-          success: function(){
+          success: function(result){
+            for(var i = 0; i < idx.length; i++){
+              var upd = {
+                act : "dtlpost",
+                idx : idx[i],
+                id_posting : result.id
+              }
+
+              $.ajax({
+                url: site+"/API/posting/",
+                method: "POST",
+                data: JSON.stringify(upd),
+                success: function(){
+                  // console.log("Update IDX " + upd.idx + " sukses.");
+                }
+              })
+            }
+
             app.toast.create({
               text: "Posting Harian Berhasil",
               closeTimeout: 3000,
               closeButton: true
             }).open();
 
-            idx = [];
-            po_simpanan = [];
+            // idx = [];
+            // po_simpanan = [];
             app.views.main.router.navigate('/cif/');
           }
         })
@@ -648,6 +733,25 @@ function onBackPressed(){
   })
 }
 
+function onTouchStart(){
+  console.log("this is touchstart action");
+  if(timeout_dur){
+    console.log("timer cleared");
+    clearTimeout(logout_timer);
+  }
+}
+
+function onTouchEnd(){
+  console.log("this is touchend action");
+  if(timeout_dur){
+    console.log("timer added");
+    logout_timer = setTimeout(function(){
+     // alert("Hello");
+     onLogout(1);
+    }, timeout_dur * 1000 * 60);
+  }
+}
+
 function comma(el){
   if(el.value == '') el.value = 0;
   el.value = parseInt((el.value).replace(/\D/g, '')).toLocaleString('id-ID');
@@ -703,22 +807,43 @@ function printChooser(){
   }
 }
 
-/*
-  <th class="checkbox-cell">\
-    <label class="checkbox">\
-      <input type="checkbox"/>\
-      <i class="icon-checkbox"></i>\
-    </label>\
-  </th>\
-*/
+function dialogShare(){
+  var options = {
+    documentSize: 'A4',
+    type: 'base64'
+  }
 
-/*
-  $.each($('.data-table-row-selected'), function(k, i){
-    let e = i.innerText.split('\t');
-    a.push({
-      rek: e[1],
-      jenis: e[2],
-      saldo: e[3]
-      })
-  })
-*/
+  pdf.fromData(to_be_previewed, options)
+    .then(function(base64){
+      window.plugins.socialsharing.share(null, null, 'data:application/pdf;base64,'+base64, null);
+      // console.log(base64);
+    })
+    .catch(function(err){
+      console.log(err);
+    })
+}
+
+function cekSession(){
+  try{
+    $.ajax({
+      url: site+"/API/log/"+iduser+"/",
+      method: "GET",
+      success: function(result){
+        // console.log(result[0].token);
+        if(result[0].token == session_token){
+          console.log("token matched");
+          session_checker = setTimeout(cekSession, 3 * 1000);
+        } else {
+          console.log("token mismatched");
+          onLogout(2);
+        }
+      }, error: function(){
+        onLogout(3);
+        // throw "cannot connect to server";
+        // console.log("cannot connect to server");
+      }
+    })
+  } catch(e){
+    console.error(e);
+  }
+}
