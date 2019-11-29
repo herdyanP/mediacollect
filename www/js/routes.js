@@ -277,6 +277,7 @@ var routes =
       pageInit: function(){
         idx = [];
         po_simpanan = [];
+        tot_simpanan = 0;
       }
     }
   },
@@ -339,6 +340,29 @@ var routes =
           success: function(result){
             var datanya = '<div class="list no-hairlines">\
                             <ul>\
+                              <li class="item-divider">Ubah Password</li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Password Baru</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="password" id="pass_baru" name="pass_baru" value="">\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content item-input">\
+                                <div class="item-inner">\
+                                  <div class="item-title item-label">Ulangi Password Baru</div>\
+                                  <div class="item-input-wrap">\
+                                    <input type="password" id="ulangpass_baru" name="ulangpass_baru" value="">\
+                                  </div>\
+                                </div>\
+                              </li>\
+                              <li class="item-content">\
+                                <div class="item-inner">\
+                                  <button id="pass_button" class="button button-fill" onclick="ubahPass()">Ubah Password</button>\
+                                </div>\
+                              </li>\
+                              <li class="item-divider">Data Profil</li>\
                               <li class="item-content item-input">\
                                 <div class="item-inner">\
                                   <div class="item-title item-label">Nama Pegawai</div>\
