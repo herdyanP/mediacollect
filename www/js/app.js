@@ -47,6 +47,12 @@ function onNewLogin(form){
     method: "POST",
     success: function(result){
       if(result.length > 0){
+        if(result[0].ID_ROLE == 1){
+          $('#backend_only').css('display', 'block');
+        } else if(result[0].ID_ROLE == 2){
+          $('#collection_only').css('display', 'block');
+        }
+
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
@@ -69,6 +75,9 @@ function onNewLogin(form){
 }
 
 function onLogout(t){
+  $('#backend_only').css('display', 'none');
+  $('#collection_only').css('display', 'none');
+  
   timeout_dur = 0;
   iduser = '';
   clearTimeout(session_checker);
@@ -103,6 +112,14 @@ function onLogout(t){
       app.toast.create({
         text: "Anda Telah Logout Secara Otomatis Karena Terputus Dari Jaringan",
         closeTimeout: 10000,
+        closeButton: true
+      }).open();
+      break;
+
+    case 4:
+      app.toast.create({
+        text: "Password Telah Berhasil Diperbarui. Silahkan Login Ulang",
+        closeTimeout: 3000,
         closeButton: true
       }).open();
       break;
@@ -345,6 +362,8 @@ function printSetoran(temp){
               closeTimeout: 3000,
               closeButton: true
             }).open();
+            // cekCIF("coll_s", temp.cif);
+            app.views.main.router.refreshPage();
           }
         })
       }, function() {
@@ -379,6 +398,7 @@ function posting(){
     success: function(result){
       temp.trans = result.trans;
       printPosting(temp);
+      // bypassPosting(temp);
       // previewPosting(temp);
     }
   })
@@ -397,7 +417,7 @@ function previewPosting(temp){
   var jeni_detil = '';
 
   var cetakan = 'Berhasil';
-  var table_head = '<table><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
+  var table_head = '<table style="width: 100%;"><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
 
   var kop = '<tr><td colspan="3" style="text-align: center;">PD BPR BANK SLEMAN</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
   // var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
@@ -405,13 +425,14 @@ function previewPosting(temp){
   var separator = '<tr><td colspan="3" style="border-top: dashed black 2px"></td></tr>';
   // var separator = "--------------------------------{br}";
 
-  var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SIMP</td><td>:</td><td>'+temp.simpanan.toLocaleString('id-ID')+'</td></tr><tr><td>TOT PINJ</td><td>:</td><td>'+temp.pinjaman.toLocaleString('id-ID')+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
+  // var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SIMP</td><td>:</td><td>'+temp.simpanan.toLocaleString('id-ID')+'</td></tr><tr><td>TOT PINJ</td><td>:</td><td>'+temp.pinjaman.toLocaleString('id-ID')+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
+  var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
   // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
 
   var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
   // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
-  var jeni_head = '<tr><td colspan="3"><table><tr><th style="width: 30%;"></th><th style="width: 30%;"></th><th style="width: 40%;"></th></tr>';
+  var jeni_head = '<tr><td colspan="3"><table style="width: 100%;"><tr><th style="width: 30%; text-align: left;">CIF</th><th style="width: 30%; text-align: left;">JENIS</th><th style="width: 40%; text-align: right;">NOMINAL</th></tr>';
   var jeni_end = '</table></td></tr>';
   // var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
 
@@ -420,10 +441,10 @@ function previewPosting(temp){
     // jeni_detil += po_simpanan[i].cif + "   " + po_simpanan[i].rek + "   " + lpad(po_simpanan[i].nominal.toLocaleString("id-ID"), 10, ' ') + "{br}";
   }
 
-  var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
+  // var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
   // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
 
-  var thanks = '<tr><td colspan="3">- Terima Kasih -</td></tr>';
+  var thanks = '<tr><td colspan="3" style="text-align: center;">- Terima Kasih -</td></tr>';
   // var thanks = "{center}- Terima Kasih -{br}";
   var eol = "{br}{br}{br}";
   var table_end = '</table><br><br>';
@@ -534,13 +555,30 @@ function printPosting(temp){
 }
 
 function laporanReport(){
-  var tgl_awal = $("#tgl_awal").val();
-  var tgl_akhir = $("#tgl_akhir").val();
+  var tgl_awal = '';
+  var tgl_akhir = '';
+
+  switch(jenis_laporan){
+    case "closing":
+      tgl_awal = $("#tgl_awal_c").val();
+      tgl_akhir = $("#tgl_akhir_c").val();
+      break;
+    case "saving":
+      tgl_awal = $("#tgl_awal_s").val();
+      tgl_akhir = $("#tgl_akhir_s").val();
+      break;
+    case "rekap":
+      tgl_awal = $("#tgl_awal_r").val();
+      tgl_akhir = $("#tgl_akhir_r").val();
+      break;
+  }
+
   var c = 1;
   var temp = {
     tipe : jenis_laporan,
     tgl_awal : tgl_awal,
     tgl_akhir : tgl_akhir,
+    id_user : iduser
   }
 
   $.ajax({
@@ -780,6 +818,60 @@ function bypassSetoran(temp){
         closeTimeout: 3000,
         closeButton: true
       }).open();
+      // cekCIF("coll_s", temp.cif);
+      app.views.main.router.refreshPage();
+    }
+  })
+}
+
+function bypassPosting(temp){
+  for(var i = 0; i < idx.length; i++){
+    var upd = {
+      act : "update",
+      idx : idx[i]
+    };
+
+    $.ajax({
+      url: site+"/API/setoran/",
+      method: "POST",
+      data: JSON.stringify(upd),
+      success: function(){
+        console.log("Update IDX " + upd.idx + " sukses.");
+      }
+    })
+  }
+
+  $.ajax({
+    url: site+"/API/posting/",
+    method: "POST",
+    data: JSON.stringify(temp),
+    success: function(result){
+      for(var i = 0; i < idx.length; i++){
+        var upd = {
+          act : "dtlpost",
+          idx : idx[i],
+          id_posting : result.id
+        }
+
+        $.ajax({
+          url: site+"/API/posting/",
+          method: "POST",
+          data: JSON.stringify(upd),
+          success: function(){
+            // console.log("Update IDX " + upd.idx + " sukses.");
+          }
+        })
+      }
+
+      app.toast.create({
+        text: "Posting Harian Berhasil",
+        closeTimeout: 3000,
+        closeButton: true
+      }).open();
+
+      // idx = [];
+      // po_simpanan = [];
+      app.views.main.router.navigate('/cif/');
     }
   })
 }
@@ -845,5 +937,32 @@ function cekSession(){
     })
   } catch(e){
     console.error(e);
+  }
+}
+
+function ubahPass(){
+  var pass1 = $('#pass_baru').val();
+  var pass2 = $('#ulangpass_baru').val();
+  if(pass1 == pass2){
+    var temp = {
+      pass_baru : pass1,
+      id_user : iduser
+    }
+
+    $.ajax({
+      url: site+"/API/pass/",
+      method: "POST",
+      data: JSON.stringify(temp),
+      success: function(result){
+        console.log(result.status);
+        if(result.status == "sukses") onLogout(4);
+      }
+    })
+  } else {
+    app.toast.create({
+      text: "Password Baru Tidak Sama!",
+      closeTimeout: 3000,
+      closeButton: true
+    }).open();
   }
 }
