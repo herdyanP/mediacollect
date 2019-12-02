@@ -77,7 +77,7 @@ function onNewLogin(form){
 function onLogout(t){
   $('#backend_only').css('display', 'none');
   $('#collection_only').css('display', 'none');
-  
+
   timeout_dur = 0;
   iduser = '';
   clearTimeout(session_checker);
@@ -917,8 +917,10 @@ function dialogShare(){
 
 function cekSession(){
   try{
+    var url_with_name = encodeURI(site+"/API/log/"+iduser.replace(/\s/g, '+')+"/");
     $.ajax({
-      url: site+"/API/log/"+iduser+"/",
+      // url: site+"/API/log/"+iduser+"/",
+      url: url_with_name,
       method: "GET",
       success: function(result){
         // console.log(result[0].token);
