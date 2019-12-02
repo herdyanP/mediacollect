@@ -47,14 +47,6 @@ function onNewLogin(form){
     method: "POST",
     success: function(result){
       if(result.length > 0){
-        if(result[0].ID_ROLE == 2){
-          $('#divider_utama').css('display', 'block');
-          $('#menu_collection').css('display', 'block');
-          $('#menu_posting').css('display', 'block');
-        }
-
-        
-
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
@@ -63,7 +55,15 @@ function onNewLogin(form){
          onLogout(1);
         }, timeout_dur * 1000 * 60);
 
-        app.views.main.router.navigate('/coll_simpanan/');
+        if(result[0].ID_ROLE == 2){
+          $('#divider_utama').css('display', 'block');
+          $('#menu_collection').css('display', 'block');
+          $('#menu_posting').css('display', 'block');
+          app.views.main.router.navigate('/coll_simpanan/');
+        } else {
+          app.views.main.router.navigate('/report_s/');
+        }
+
         cekSession();
       } else {
         app.toast.create({
@@ -311,7 +311,8 @@ function previewSetoran(temp){
   var separator = '<tr><td colspan="3" style="border-top: dashed black 2px"></td></tr>';
   // var separator = "--------------------------------{br}";
 
-  var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
+  var detil = '<tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
+  // var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
   // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
   var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
@@ -346,7 +347,8 @@ function printSetoran(temp){
       var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
       var separator_unik = "-- -------------------------- --{br}";
-      var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+      // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+      var detil = "{left}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
       var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
       var thanks = "{center}- Terima Kasih -{br}";
@@ -612,9 +614,10 @@ function laporanReport(){
                                 <th style="width: 5%;">No</th>\
                                 <th style="width: 10%;">User</th>\
                                 <th style="width: 25%;">Tanggal</th>\
-                                <th style="width: 20%;">Simpanan</th>\
-                                <th style="width: 20%;">Pinjaman</th>\
+                                <th style="width: 15%;">Simpanan</th>\
+                                <th style="width: 15%;">Pinjaman</th>\
                                 <th style="width: 20%;">Total</th>\
+                                <th style="width: 10%;"></th>\
                               </tr>\
                             </thead>\
                             <tbody>\
@@ -627,6 +630,7 @@ function laporanReport(){
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].SIMPANAN).toLocaleString('id-ID') +'</td>\
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].PINJAMAN).toLocaleString('id-ID') +'</td>\
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].TOTAL).toLocaleString('id-ID') +'</td>\
+                          <td ><a onclick="printUlang('+ result[i].ID_POSTING +')">Print</a></td>\
             ';
 
             total_s += parseInt(result[i].SIMPANAN);
@@ -897,8 +901,10 @@ function pindahLaporan(jenis){
 function printChooser(){
   if(to_be_printed.jenis_print == 'setoran'){
     printSetoran(to_be_printed);
+    // bypassSetoran(to_be_printed);
   } else if(to_be_printed.jenis_print == 'posting'){
     printPosting(to_be_printed);
+    // bypassPosting(to_be_printed);
   }
 }
 
@@ -970,4 +976,65 @@ function ubahPass(){
       closeButton: true
     }).open();
   }
+}
+
+function printUlang(id){
+  $.ajax({
+    url: site+"/API/print/"+id+"/",
+    method: "GET",
+    success: function(result){
+      var dt = new Date();
+      var yr = dt.getFullYear();
+      var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+      var dy = ('00'+dt.getDate()).slice(-2);
+      var hr = ('00'+dt.getHours()).slice(-2);
+      var mn = ('00'+dt.getMinutes()).slice(-2);
+      var sc = ('00'+dt.getSeconds()).slice(-2);
+      var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+
+      var cetakan = 'Berhasil';
+      var head_unik = "{left}-{br}";
+      var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var separator = "--------------------------------{br}";
+      var separator_unik = "-- -------------------------- --{br}";
+      // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+
+      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + result[0].ID_USER + "{br}NO        : " + result[0].NO_TRANSAKSI + "{br}TANGGAL   : " + result[0].TANGGAL.replace(/\-/g, '/') + "{br}TOT SIMP  : " + parseInt(result[0].SIMPANAN).toLocaleString("id-ID") + "{br}TOT PINJ  : " + parseInt(result[0].PINJAMAN).toLocaleString("id-ID") + "{br}TOT SETOR : " + parseInt(result[0].TOTAL).toLocaleString("id-ID") + "{br}";
+      var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
+      var thanks = "{center}- Terima Kasih -{br}";
+      var eol = "{br}{br}{br}";
+
+      var jeni_detil = '';
+      var c = '1000000000';
+      for(var i = 0; i < result.length; i++){
+        jeni_detil += result[i].NO_ANGGOTA + "   " + result[i].ID_SIMPANAN + "   " + lpad(parseInt(result[i].NOMINAL).toLocaleString("id-ID"), 10, ' ') + "{br}";
+      }
+
+      cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
+      // console.log(cetakan);
+
+      window.DatecsPrinter.listBluetoothDevices(function (devices) {
+        window.DatecsPrinter.connect(devices[0].address, function() {
+          window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+            app.toast.create({
+              text: "Print Ulang Berhasil",
+              closeTimeout: 3000,
+              closeButton: true
+            }).open();
+          }, function() {
+            alert("Gagal Mencetak, Proses Dibatalkan");
+            // alert(JSON.stringify(error));
+          });
+            // printBayar(q);
+        },
+        function() {
+          alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
+          // alert(JSON.stringify(error));
+        });
+      },
+      function (error) {
+        // alert(JSON.stringify(error));
+      });
+    }
+  })
 }
