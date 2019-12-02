@@ -47,11 +47,13 @@ function onNewLogin(form){
     method: "POST",
     success: function(result){
       if(result.length > 0){
-        if(result[0].ID_ROLE == 1){
-          $('#backend_only').css('display', 'block');
-        } else if(result[0].ID_ROLE == 2){
-          $('#collection_only').css('display', 'block');
+        if(result[0].ID_ROLE == 2){
+          $('#divider_utama').css('display', 'block');
+          $('#menu_collection').css('display', 'block');
+          $('#menu_posting').css('display', 'block');
         }
+
+        
 
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
@@ -75,8 +77,9 @@ function onNewLogin(form){
 }
 
 function onLogout(t){
-  $('#backend_only').css('display', 'none');
-  $('#collection_only').css('display', 'none');
+  $('#divider_utama').css('display', 'none');
+  $('#menu_collection').css('display', 'none');
+  $('#menu_posting').css('display', 'none');
 
   timeout_dur = 0;
   iduser = '';
