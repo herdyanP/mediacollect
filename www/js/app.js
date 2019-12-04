@@ -34,6 +34,7 @@ var logout_timer = '';
 var session_token = '';
 var session_checker = '';
 var limit_harian = 0;
+var hari = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
 
 function onNewLogin(form){
   var temp = {};
@@ -63,6 +64,7 @@ function onNewLogin(form){
           $('#menu_posting').css('display', 'block');
           app.views.main.router.navigate('/coll_simpanan/');
         } else {
+          jenis_laporan = 'saving';
           app.views.main.router.navigate('/report_s/');
         }
 
@@ -282,9 +284,9 @@ function proses(jenis, cif, rek, nama, sal, limit){
               console.log(result.trans);
               temp.trans = result.trans;
               // console.log(temp);
-              // printSetoran(temp);
+              printSetoran(temp);
               // previewSetoran(temp);
-              bypassSetoran(temp);
+              // bypassSetoran(temp);
 
               dialog.close();
             }
@@ -310,7 +312,10 @@ function previewSetoran(temp){
   var hr = ('00'+dt.getHours()).slice(-2);
   var mn = ('00'+dt.getMinutes()).slice(-2);
   var sc = ('00'+dt.getSeconds()).slice(-2);
-  var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+  var cd = hari[dt.getDay()];
+  // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+  var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+  var timestamp = hr + ":" + mn + ":" + sc;
 
   var cetakan = 'Berhasil';
   var table_head = '<table style="width: 100%;"><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
@@ -325,7 +330,7 @@ function previewSetoran(temp){
   // var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
   // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
-  var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
+  var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>HARI/TGL</td><td>:</td><td>'+datestamp+'</td></tr><tr><td>JAM</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
   // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
 
   var thanks = '<tr><td colspan="3" style="text-align: center;">- Terima Kasih -</td></tr>';
@@ -350,7 +355,10 @@ function printSetoran(temp){
       var hr = ('00'+dt.getHours()).slice(-2);
       var mn = ('00'+dt.getMinutes()).slice(-2);
       var sc = ('00'+dt.getSeconds()).slice(-2);
-      var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+      var cd = hari[dt.getDay()];
+      // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+      var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+      var timestamp = hr + ":" + mn + ":" + sc;
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
@@ -360,7 +368,8 @@ function printSetoran(temp){
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
       var detil = "{left}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
-      var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+      // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+      var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
       var thanks = "{center}- Terima Kasih -{br}";
       var eol = "{br}{br}{br}";
 
@@ -413,8 +422,8 @@ function posting(){
     method: "GET",
     success: function(result){
       temp.trans = result.trans;
-      // printPosting(temp);
-      bypassPosting(temp);
+      printPosting(temp);
+      // bypassPosting(temp);
       // previewPosting(temp);
     }
   })
@@ -429,7 +438,10 @@ function previewPosting(temp){
   var hr = ('00'+dt.getHours()).slice(-2);
   var mn = ('00'+dt.getMinutes()).slice(-2);
   var sc = ('00'+dt.getSeconds()).slice(-2);
-  var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+  var cd = hari[dt.getDay()];
+  // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+  var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+  var timestamp = hr + ":" + mn + ":" + sc;
   var jeni_detil = '';
 
   var cetakan = 'Berhasil';
@@ -442,7 +454,7 @@ function previewPosting(temp){
   // var separator = "--------------------------------{br}";
 
   // var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SIMP</td><td>:</td><td>'+temp.simpanan.toLocaleString('id-ID')+'</td></tr><tr><td>TOT PINJ</td><td>:</td><td>'+temp.pinjaman.toLocaleString('id-ID')+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
-  var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
+  var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>HARI/TGL</td><td>:</td><td>'+datestamp+'</td></tr><tr><td>JAM</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
   // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
 
   var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
@@ -482,7 +494,10 @@ function printPosting(temp){
       var hr = ('00'+dt.getHours()).slice(-2);
       var mn = ('00'+dt.getMinutes()).slice(-2);
       var sc = ('00'+dt.getSeconds()).slice(-2);
-      var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+      var cd = hari[dt.getDay()];
+      // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+      var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+      var timestamp = hr + ":" + mn + ":" + sc;
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
@@ -491,7 +506,9 @@ function printPosting(temp){
       var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
-      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
+      // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
+      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}HARI/TGL  : " + datestamp + "{br}JAM       : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
+
       var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
       var thanks = "{center}- Terima Kasih -{br}";
       var eol = "{br}{br}{br}";
@@ -684,10 +701,11 @@ function laporanReport(){
                             <thead>\
                               <tr>\
                                 <th style="width: 5%;">No</th>\
-                                <th style="width: 25%;">CIF</th>\
-                                <th style="width: 25%;">Tanggal</th>\
-                                <th style="width: 20%;">User</th>\
+                                <th style="width: 30%;">Nama Nasabah</th>\
                                 <th style="width: 25%;">Nominal</th>\
+                                <th style="width: 10%;">CIF</th>\
+                                <th style="width: 25%;">Tanggal</th>\
+                                <th style="width: 5%;">User</th>\
                               </tr>\
                             </thead>\
                             <tbody>\
@@ -695,10 +713,11 @@ function laporanReport(){
           for(var i = 0; i < result.length; i++){
             datanya += '<tr>\
                           <td style="text-align: center; padding: 10px 0;">'+ c +'</td>\
-                          <td style="text-align: center; padding: 10px 0;">'+ result[i].NO_ANGGOTA +'</td>\
+                          <td style="text-align: center; padding: 10px 0;">'+ result[i].NAMA +'</td>\
+                          <td style="text-align: right; padding: 10px 10px 10px 0;">'+ parseInt(result[i].NOMINAL).toLocaleString('id-ID') +'</td>\
+                          <td style="text-align: center; padding: 10px 0;">'+ result[i].CIF +'</td>\
                           <td style="text-align: center; padding: 10px 0;">'+ result[i].TANGGAL.split(' ')[0] +'</td>\
-                          <td style="text-align: center; padding: 10px 0;">'+ result[i].ID_USER +'</td>\
-                          <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].NOMINAL).toLocaleString('id-ID') +'</td>\
+                          <td style="text-align: center; padding: 10px 0;">'+ result[i].USER +'</td>\
             ';
 
             total_n += parseInt(result[i].NOMINAL);
@@ -710,7 +729,7 @@ function laporanReport(){
                         </div>\
                       ';*/
 
-          datanya += '<tr><td colspan="4" style="text-align: right; padding-right: 10px; background: #bbb;">Total</td><td style="text-align: right; background: #bbb;">'+total_n.toLocaleString('id-ID')+'</td></tr>';  
+          datanya += '<tr><td colspan="2" style="text-align: right; padding-right: 10px; background: #bbb;">Total</td><td style="text-align: right; background: #bbb; padding: 10px 10px 10px 0;">'+total_n.toLocaleString('id-ID')+'</td></tr>';  
           datanya += '</tbody>\
               </table>\
           ';

@@ -48,7 +48,7 @@ var routes =
               data: JSON.stringify(temp),
               success: function(result){
                 for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
                 }
 
                 autoc.preloaderHide();
@@ -101,7 +101,8 @@ var routes =
               data: JSON.stringify(temp),
               success: function(result){
                 for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                  // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
                   // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
                 }
 
