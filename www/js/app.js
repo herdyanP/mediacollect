@@ -33,6 +33,7 @@ var timeout_dur = 0;
 var logout_timer = '';
 var session_token = '';
 var session_checker = '';
+var limit_harian = 0;
 
 function onNewLogin(form){
   var temp = {};
@@ -50,6 +51,7 @@ function onNewLogin(form){
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
+        limit_harian = parseInt(result[0].limit_harian);
         logout_timer = setTimeout(function(){
          // alert("Hello");
          onLogout(1);
@@ -210,7 +212,7 @@ function cekCIF(src, cif){
                         <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
                         <td>'+result[i].SSTGL+'</td>\
                         <td>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</td>\
-                        <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\')">Proses</a></td>\
+                        <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\', '+result[i].LIMIT+')">Proses</a></td>\
                       </tr>\
               ';
             }
@@ -232,7 +234,7 @@ function cekCIF(src, cif){
   }
 }
 
-function proses(jenis, cif, rek, nama, sal){
+function proses(jenis, cif, rek, nama, sal, limit){
   app.dialog.create({
     title: 'Setoran',
     closeByBackdropClick: false,
@@ -272,20 +274,28 @@ function proses(jenis, cif, rek, nama, sal){
           saldo : newsaldo
         }
 
-        $.ajax({
-          url: site+"/API/trans/setoran/",
-          method: "GET",
-          success: function(result){
-            console.log(result.trans);
-            temp.trans = result.trans;
-            // console.log(temp);
-            printSetoran(temp);
-            // previewSetoran(temp);
-            // bypassSetoran(temp);
+        if(nominal + limit <= limit_harian){
+          $.ajax({
+            url: site+"/API/trans/setoran/",
+            method: "GET",
+            success: function(result){
+              console.log(result.trans);
+              temp.trans = result.trans;
+              // console.log(temp);
+              // printSetoran(temp);
+              // previewSetoran(temp);
+              bypassSetoran(temp);
 
-            dialog.close();
-          }
-        })
+              dialog.close();
+            }
+          })
+        } else {
+          app.toast.create({
+            text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
+            closeTimeout: 3000,
+            closeButton: true
+          }).open();
+        }
       }
     }]
   }).open();
@@ -387,6 +397,7 @@ function printSetoran(temp){
 }
 
 function posting(){
+  $('#proses_posting').addClass('disabled');
   var tot_posting = tot_simpanan + tot_pinjaman;
   var temp = {
     jenis_print : "posting",
@@ -402,8 +413,8 @@ function posting(){
     method: "GET",
     success: function(result){
       temp.trans = result.trans;
-      printPosting(temp);
-      // bypassPosting(temp);
+      // printPosting(temp);
+      bypassPosting(temp);
       // previewPosting(temp);
     }
   })
@@ -875,6 +886,8 @@ function bypassPosting(temp){
         closeTimeout: 3000,
         closeButton: true
       }).open();
+
+      $('#proses_posting').removeClass('disabled');
 
       // idx = [];
       // po_simpanan = [];

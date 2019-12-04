@@ -249,6 +249,7 @@ var routes =
           url: site+"/API/posting/"+iduser+"/",
           method: "GET",
           success: function(result){
+            if(!result.length) $('#proses_posting').addClass('disabled');
             for(var i = 0; i < result.length; i++){
               var temp = {
                 cif : result[i].NO_ANGGOTA,
