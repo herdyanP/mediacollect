@@ -36,6 +36,7 @@ var session_checker = '';
 var limit_harian = 0;
 var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 var listCabang = [];
+var gagal_print = '';
 
 function onNewLogin(form){
   var temp = {};
@@ -348,6 +349,7 @@ function previewSetoran(temp){
 }
 
 function printSetoran(temp){
+  gagal_print = temp;
   window.DatecsPrinter.listBluetoothDevices(function (devices) {
     window.DatecsPrinter.connect(devices[0].address, function() {
       var dt = new Date();
@@ -361,6 +363,9 @@ function printSetoran(temp){
       // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
       var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
       var timestamp = hr + ":" + mn + ":" + sc;
+
+      gagal_print[datestamp] = datestamp;
+      gagal_print[timestamp] = timestamp;
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
@@ -486,6 +491,7 @@ function previewPosting(temp){
 }
 
 function printPosting(temp){
+
   window.DatecsPrinter.listBluetoothDevices(function (devices) {
     window.DatecsPrinter.connect(devices[0].address, function() {
       var dt = new Date();
@@ -1071,4 +1077,63 @@ function printUlang(id){
       });
     }
   })
+}
+
+function printUlangSetoran(){
+  if(gagal_print){
+
+    window.DatecsPrinter.listBluetoothDevices(function (devices) {
+      window.DatecsPrinter.connect(devices[0].address, function() {
+        var dt = new Date();
+        var yr = dt.getFullYear();
+        var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+        var dy = ('00'+dt.getDate()).slice(-2);
+        var hr = ('00'+dt.getHours()).slice(-2);
+        var mn = ('00'+dt.getMinutes()).slice(-2);
+        var sc = ('00'+dt.getSeconds()).slice(-2);
+        var cd = hari[dt.getDay()];
+        // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+        var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+        var timestamp = hr + ":" + mn + ":" + sc;
+  
+        var cetakan = 'Berhasil';
+        var head_unik = "{left}-{br}";
+        var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+        var separator = "--------------------------------{br}";
+        var separator_unik = "-- -------------------------- --{br}";
+        // var detil = "{left}CIF  : " + gagal_print.cif + "{br}NAMA : " + gagal_print.nama + "{br}OPR  : " + iduser + "{br}";
+        var detil = "{left}NAMA : " + gagal_print.nama + "{br}OPR  : " + iduser + "{br}";
+  
+        // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + gagal_print.trans + "{br}REK      : " + gagal_print.rek + "{br}AMOUNT   : " + gagal_print.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + gagal_print.saldo.toLocaleString("id-ID") + "{br}";
+        var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + gagal_print.datestamp + "{br}JAM      : " + gagal_print.timestamp + "{br}NO TRANS : " + gagal_print.trans + "{br}REK      : " + gagal_print.rek + "{br}AMOUNT   : " + gagal_print.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + gagal_print.saldo.toLocaleString("id-ID") + "{br}";
+        var thanks = "{center}- Terima Kasih -{br}";
+        var eol = "{br}{br}{br}";
+  
+        cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
+        window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+          app.toast.create({
+            text: "Cetak Ulang Receipt Setoran Berhasil",
+            closeTimeout: 3000,
+            closeButton: true
+          }).open();
+          // app.views.main.router.refreshPage();
+        }, function() {
+          alert("Gagal Mencetak Ulang");
+        });
+      },
+      function() {
+        alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
+        // alert(JSON.stringify(error));
+      });
+    },
+    function (error) {
+      // alert(JSON.stringify(error));
+    });
+  } else {
+    app.toast.create({
+      text: "Belum Terjadi Proses Setoran, Tidak Ada Yang Bisa Diprint",
+      closeTimeout: 3000,
+      closeButton: true
+    }).open();
+  }
 }
