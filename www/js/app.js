@@ -34,7 +34,7 @@ var logout_timer = '';
 var session_token = '';
 var session_checker = '';
 var limit_harian = 0;
-var hari = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
+var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 
 function onNewLogin(form){
   var temp = {};
