@@ -376,25 +376,23 @@ function printSetoran(temp){
       var eol = "{br}{br}{br}";
 
       cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
-
-      window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
-        $.ajax({
-          url: site+"/API/setoran/",
-          method: "POST",
-          data: JSON.stringify(temp),
-          success: function(){
+      $.ajax({
+        url: site+"/API/setoran/",
+        method: "POST",
+        data: JSON.stringify(temp),
+        success: function(){
+          window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
             app.toast.create({
               text: "Setoran Berhasil",
               closeTimeout: 3000,
               closeButton: true
             }).open();
-            // cekCIF("coll_s", temp.cif);
             app.views.main.router.refreshPage();
-          }
-        })
-      }, function() {
-        alert("Gagal Mencetak, Proses Dibatalkan");
-      });
+          }, function() {
+            alert("Gagal Mencetak, Proses Dibatalkan");
+          });
+        }
+      })
         // printBayar(q);
     },
     function() {
@@ -524,61 +522,62 @@ function printPosting(temp){
 
       cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
 
-      window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
-        for(var i = 0; i < idx.length; i++){
-          var upd = {
-            act : "update",
-            idx : idx[i]
-          };
-
-          $.ajax({
-            url: site+"/API/setoran/",
-            method: "POST",
-            data: JSON.stringify(upd),
-            success: function(){
-              console.log("Update IDX " + upd.idx + " sukses.");
-            }
-          })
-        }
+      for(var i = 0; i < idx.length; i++){
+        var upd = {
+          act : "update",
+          idx : idx[i]
+        };
 
         $.ajax({
-          url: site+"/API/posting/",
+          url: site+"/API/setoran/",
           method: "POST",
-          data: JSON.stringify(temp),
-          success: function(result){
-            for(var i = 0; i < idx.length; i++){
-              var upd = {
-                act : "dtlpost",
-                idx : idx[i],
-                id_posting : result.id
-              }
+          data: JSON.stringify(upd),
+          success: function(){
+            console.log("Update IDX " + upd.idx + " sukses.");
+          }
+        })
+      }
 
-              $.ajax({
-                url: site+"/API/posting/",
-                method: "POST",
-                data: JSON.stringify(upd),
-                success: function(){
-                  // console.log("Update IDX " + upd.idx + " sukses.");
-                }
-              })
+      $.ajax({
+        url: site+"/API/posting/",
+        method: "POST",
+        data: JSON.stringify(temp),
+        success: function(result){
+          for(var i = 0; i < idx.length; i++){
+            var upd = {
+              act : "dtlpost",
+              idx : idx[i],
+              id_posting : result.id
             }
 
+            $.ajax({
+              url: site+"/API/posting/",
+              method: "POST",
+              data: JSON.stringify(upd),
+              success: function(){
+                // console.log("Update IDX " + upd.idx + " sukses.");
+              }
+            })
+          }
+
+          window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
             app.toast.create({
               text: "Posting Harian Berhasil",
               closeTimeout: 3000,
               closeButton: true
             }).open();
-
+    
             // idx = [];
             // po_simpanan = [];
             app.views.main.router.navigate('/cif/');
-          }
-        })
-      }, function() {
-        alert("Gagal Mencetak, Proses Dibatalkan");
-        // alert(JSON.stringify(error));
-      });
-        // printBayar(q);
+          }, function() {
+            alert("Gagal Mencetak, Proses Dibatalkan");
+            // alert(JSON.stringify(error));
+          });
+          
+        }
+      })
+      // printBayar(q);
     },
     function() {
       alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
