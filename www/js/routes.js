@@ -198,6 +198,18 @@ var routes =
         <div class="page-content">\
           <div class="block" id="sub"></div>\
           <div class="block">\
+            <div class="list no-hairlines no-hairlines between">\
+              <ul>\
+                <li class="item-content item-input inline-label">\
+                  <div class="item-inner">\
+                    <div class="item-title item-label">Cabang</div>\
+                    <div class="item-input-wrap input-dropdown-wrap">\
+                      <select id="cabang"></select>\
+                    </div>\
+                  </div>\
+                </li>\
+              </ul>\
+            </div>\
             <div class="data-table card">\
               <div class="card-header">\
                 <div class="data-table-title">Collection Simpanan</div>\
@@ -245,6 +257,11 @@ var routes =
                       </thead>\
                       <tbody>\
         ';
+
+        $('#cabang').empty();
+        for(var i = 0; i < listCabang.length; i++){
+          $('#cabang').append('<option value="'+listCabang[i].id_cab+'">'+listCabang[i].cabang+'</option>');
+        }
 
         $.ajax({
           url: site+"/API/posting/"+iduser+"/",

@@ -35,6 +35,7 @@ var session_token = '';
 var session_checker = '';
 var limit_harian = 0;
 var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+var listCabang = [];
 
 function onNewLogin(form){
   var temp = {};
@@ -52,6 +53,7 @@ function onNewLogin(form){
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
+        listCabang = result[0].cabang;
         limit_harian = parseInt(result[0].limit_harian);
         logout_timer = setTimeout(function(){
          // alert("Hello");
@@ -414,7 +416,8 @@ function posting(){
     user : iduser,
     simpanan : tot_simpanan,
     pinjaman : tot_pinjaman,
-    total : tot_posting
+    total : tot_posting,
+    cabang : $('#cabang').val()
   }
 
   $.ajax({
