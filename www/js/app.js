@@ -37,6 +37,7 @@ var limit_harian = 0;
 var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 var listCabang = [];
 var gagal_print = '';
+var st1 = 0, st2 = 0;
 
 function onNewLogin(form){
   var temp = {};
@@ -55,6 +56,8 @@ function onNewLogin(form){
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
         listCabang = result[0].cabang;
+        st1 = result[0].st1;
+        st2 = result[0].st2;
         limit_harian = parseInt(result[0].limit_harian);
         logout_timer = setTimeout(function(){
          // alert("Hello");
@@ -264,39 +267,47 @@ function proses(jenis, cif, rek, nama, sal, limit){
     },{
       text: 'Simpan',
       onClick: function(dialog, e){
-        var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
-        var saldo = sal.replace(/\D/g,'');
-        var newsaldo = parseInt(saldo) + parseInt(nominal);
-        var temp = {
-          act : "insert",
-          jenis_print : "setoran",
-          jenis : jenis,
-          cif : cif,
-          rek : rek,
-          nominal : nominal,
-          nama : nama,
-          user : iduser,
-          saldo : newsaldo
-        }
-
-        if(nominal + limit <= limit_harian){
-          $.ajax({
-            url: site+"/API/trans/setoran/",
-            method: "GET",
-            success: function(result){
-              console.log(result.trans);
-              temp.trans = result.trans;
-              // console.log(temp);
-              printSetoran(temp);
-              // previewSetoran(temp);
-              // bypassSetoran(temp);
-
-              dialog.close();
-            }
-          })
+        if(st1 > 0 && st2 > 0){
+          var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
+          var saldo = sal.replace(/\D/g,'');
+          var newsaldo = parseInt(saldo) + parseInt(nominal);
+          var temp = {
+            act : "insert",
+            jenis_print : "setoran",
+            jenis : jenis,
+            cif : cif,
+            rek : rek,
+            nominal : nominal,
+            nama : nama,
+            user : iduser,
+            saldo : newsaldo
+          }
+  
+          if(nominal + limit <= limit_harian){
+            $.ajax({
+              url: site+"/API/trans/setoran/",
+              method: "GET",
+              success: function(result){
+                console.log(result.trans);
+                temp.trans = result.trans;
+                // console.log(temp);
+                printSetoran(temp);
+                // previewSetoran(temp);
+                // bypassSetoran(temp);
+  
+                dialog.close();
+              }
+            })
+          } else {
+            app.toast.create({
+              text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
+              closeTimeout: 3000,
+              closeButton: true
+            }).open();
+          }
         } else {
           app.toast.create({
-            text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
+            text: "File CSV / Setoran Belum Diupload Di Core, Silahkan Hubungi Admin / Back Office.",
             closeTimeout: 3000,
             closeButton: true
           }).open();
