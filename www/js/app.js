@@ -14,6 +14,13 @@ var app = new Framework7({
 document.addEventListener('deviceready', function() {
   app.init();
 
+  // cordova.plugins.notification.local.schedule({
+  //   title: 'My first notification',
+  //   text: 'Thats pretty easy...',
+  //   foreground: true,
+  //   trigger: {in: 10, unit: "second"}
+  // });
+
   document.addEventListener("backbutton", onBackPressed, false);
   document.addEventListener("touchend", onTouchEnd, false);
   document.addEventListener("touchstart", onTouchStart, false);
@@ -202,11 +209,11 @@ function cekCIF(src, cif){
           case "coll_s":
             dt1 = '<table>\
                 <thead>\
-                    <th class="label-cell">Rekening</th>\
-                    <th>Produk</th>\
-                    <th class="numeric-cell">Saldo</th>\
-                    <th>Update Terakhir</th>\
-                    <th>Status</th>\
+                    <th class="label-cell"><b>Rekening</b></th>\
+                    <th><b>Produk</b></th>\
+                    <th class="numeric-cell"><b>Saldo</b></th>\
+                    <th><b>Update Terakhir</b></th>\
+                    <th><b>Status</th>\
                     <th></th>\
                   </tr>\
                 </thead>\
@@ -215,11 +222,11 @@ function cekCIF(src, cif){
 
             for(var i = 0; i < result.length; i++){
               dt1 += '<tr>\
-                        <td class="label-cell">'+result[i].SSREK+'</td>\
-                        <td>'+result[i].jpinjaman+'</td>\
-                        <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
-                        <td>'+result[i].SSTGL+'</td>\
-                        <td>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</td>\
+                        <td class="label-cell"><b>'+result[i].SSREK+'</b></td>\
+                        <td><b>'+result[i].jpinjaman+'</b></td>\
+                        <td class="numeric-cell"><b>'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</b></th>\
+                        <td><b>'+result[i].SSTGL+'</b></td>\
+                        <td><b>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</b></td>\
                         <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\', '+result[i].LIMIT+')">Proses</a></td>\
                       </tr>\
               ';
@@ -252,7 +259,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
           <li class="item-content item-input">\
             <div class="item-inner">\
               <div class="item-input-wrap">\
-                <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right;" autocomplete="off"/>\
+                <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
               </div>\
             </div>\
           </li>\
