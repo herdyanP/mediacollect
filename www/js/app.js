@@ -28,7 +28,7 @@ document.addEventListener('deviceready', function() {
 
 var site = 'http://mcollection.cloudmnm.com';
 var ac;
-var iduser = '';
+var iduser = '', idrole = '';
 var tot_simpanan = 0;
 var tot_pinjaman = 0;
 var idx = [];
@@ -58,6 +58,7 @@ function onNewLogin(form){
     data: JSON.stringify(temp),
     method: "POST",
     success: function(result){
+      console.log(result);
       if(result.length > 0){
         iduser = result[0].USERNAME;
         timeout_dur = result[0].timeout;
@@ -341,7 +342,7 @@ function previewSetoran(temp){
   var cetakan = 'Berhasil';
   var table_head = '<table style="width: 100%;"><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
 
-  var kop = '<tr><td colspan="3" style="text-align: center;">PD BPR BANK SLEMAN</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
+  var kop = '<tr><td colspan="3" style="text-align: center;">PT BPR BANK SLEMAN (PERSERODA)</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
   // var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
 
   var separator = '<tr><td colspan="3" style="border-top: dashed black 2px"></td></tr>';
@@ -387,7 +388,7 @@ function printSetoran(temp){
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
-      var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
       var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
@@ -471,7 +472,7 @@ function previewPosting(temp){
   var cetakan = 'Berhasil';
   var table_head = '<table style="width: 100%;"><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
 
-  var kop = '<tr><td colspan="3" style="text-align: center;">PD BPR BANK SLEMAN</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
+  var kop = '<tr><td colspan="3" style="text-align: center;">PT BPR BANK SLEMAN (PERSERODA)</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
   // var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
 
   var separator = '<tr><td colspan="3" style="border-top: dashed black 2px"></td></tr>';
@@ -526,7 +527,7 @@ function printPosting(temp){
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
-      var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
       var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
@@ -637,7 +638,7 @@ function laporanReport(){
     tipe : jenis_laporan,
     tgl_awal : tgl_awal,
     tgl_akhir : tgl_akhir,
-    id_user : iduser
+    id_user : idrole == 2 ? iduser : 'admin'
   }
 
   $.ajax({
@@ -1052,7 +1053,7 @@ function printUlang(id){
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
-      var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
       var separator = "--------------------------------{br}";
       var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
@@ -1116,7 +1117,7 @@ function printUlangSetoran(){
   
         var cetakan = 'Berhasil';
         var head_unik = "{left}-{br}";
-        var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+        var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
         var separator = "--------------------------------{br}";
         var separator_unik = "-- -------------------------- --{br}";
         // var detil = "{left}CIF  : " + gagal_print.cif + "{br}NAMA : " + gagal_print.nama + "{br}OPR  : " + iduser + "{br}";
