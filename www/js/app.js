@@ -64,6 +64,7 @@ function onNewLogin(form){
         timeout_dur = result[0].timeout;
         session_token = result[0].token;
         listCabang = result[0].cabang;
+        idrole = result[0].ID_ROLE;
         st1 = result[0].st1;
         st2 = result[0].st2;
         limit_harian = parseInt(result[0].limit_harian);
