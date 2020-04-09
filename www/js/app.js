@@ -32,8 +32,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-// var site = 'http://mcollection.cloudmnm.com';
-var site = 'http://mcollection.cloudmnm.com/dev';
+var site = 'http://mcollection.cloudmnm.com';
+// var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -104,11 +104,14 @@ function onNewLogin(form){
             closeButton: true
           }).open();
         } else if(result[0].RESULT == 3){
-          app.toast.create({
-            text: "Harap melakukan pembaruan aplikasi",
-            closeTimeout: 3000,
-            closeButton: true
-          }).open();
+          // app.toast.create({
+          //   text: "Harap melakukan pembaruan aplikasi",
+          //   closeTimeout: 3000,
+          //   closeButton: true
+          // }).open();
+          alert('Versi terbaru ditemukan di server. Aplikasi akan melakukan pembaruan');
+          window.open(result[0].LINK,'_blank');
+          // $('#download').attr("href", result[0].LINK);
         } else {
           app.toast.create({
             text: "Error tidak diketahui",
@@ -136,8 +139,6 @@ function onLogout(t){
   iduser = '';
   clearTimeout(session_checker);
   app.views.main.router.navigate('/');
-
-  $('#appversion').html(appVer);
   
   switch(t){
     case 0:
