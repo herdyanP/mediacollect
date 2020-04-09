@@ -26,7 +26,8 @@ document.addEventListener('deviceready', function() {
   document.addEventListener("touchstart", onTouchStart, false);
 });
 
-var site = 'http://mcollection.cloudmnm.com';
+// var site = 'http://mcollection.cloudmnm.com';
+var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -45,6 +46,7 @@ var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 var listCabang = [];
 var gagal_print = '';
 var st1 = 0, st2 = 0;
+var token = '';
 
 function onNewLogin(form){
   var temp = {};
@@ -67,6 +69,7 @@ function onNewLogin(form){
         idrole = result[0].ID_ROLE;
         st1 = result[0].st1;
         st2 = result[0].st2;
+        token = result[0].TOKEN_TRANS;
         limit_harian = parseInt(result[0].limit_harian);
         logout_timer = setTimeout(function(){
          // alert("Hello");
@@ -276,7 +279,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
     },{
       text: 'Simpan',
       onClick: function(dialog, e){
-        if(st1 > 0 && st2 > 0){
+        // if(st1 > 0 && st2 > 0){
           var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
           var saldo = sal.replace(/\D/g,'');
           var newsaldo = parseInt(saldo) + parseInt(nominal);
@@ -289,22 +292,48 @@ function proses(jenis, cif, rek, nama, sal, limit){
             nominal : nominal,
             nama : nama,
             user : iduser,
-            saldo : newsaldo
+            saldo : newsaldo,
+            TOKEN : token
           }
   
           if(nominal + limit <= limit_harian){
             $.ajax({
-              url: site+"/API/trans/setoran/",
-              method: "GET",
+              url: site+"/API/setoran/",
+              method: "POST",
+              data: JSON.stringify(temp),
               success: function(result){
-                console.log(result.trans);
-                temp.trans = result.trans;
-                // console.log(temp);
-                printSetoran(temp);
-                // previewSetoran(temp);
-                // bypassSetoran(temp);
-  
-                dialog.close();
+
+                console.log(result[0].idx);
+                if(result[0].RESULT == "1"){
+                  app.toast.create({
+                    text: "Setoran Berhasil",
+                    closeTimeout: 3000,
+                    closeButton: true
+                  }).open();
+
+                  dialog.close();
+
+                  previewSetoran(result[0].idx);
+                  // printSetoran(result[0].idx);
+
+                  app.views.main.router.refreshPage();
+                } else if(result[0].RESULT == "2"){
+                  app.toast.create({
+                    text: "Setoran Gagal",
+                    closeTimeout: 3000,
+                    closeButton: true
+                  }).open();
+                  dialog.close();
+                  app.views.main.router.refreshPage();
+                } else {
+                  app.toast.create({
+                    text: "Unknown Error",
+                    closeTimeout: 3000,
+                    closeButton: true
+                  }).open();
+                  dialog.close();
+                  app.views.main.router.refreshPage();
+                }
               }
             })
           } else {
@@ -314,19 +343,151 @@ function proses(jenis, cif, rek, nama, sal, limit){
               closeButton: true
             }).open();
           }
-        } else {
+        /* } else {
           app.toast.create({
             text: "File CSV / Setoran Belum Diupload Di Core, Silahkan Hubungi Admin / Back Office.",
             closeTimeout: 3000,
             closeButton: true
           }).open();
-        }
+        } */
       }
     }]
   }).open();
 }
 
-function previewSetoran(temp){
+function printSetoran(idx){
+  gagal_print = idx;
+
+  $.ajax({
+    url: site+"/API/setoran/"+idx+"/",
+    method: "GET",
+    success: function(json){
+      window.DatecsPrinter.listBluetoothDevices(function (devices) {
+        window.DatecsPrinter.connect(devices[0].address, function() {
+          var result = json[0];
+          var dt = new Date();
+          var yr = dt.getFullYear();
+          var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+          var dy = ('00'+dt.getDate()).slice(-2);
+          var hr = ('00'+dt.getHours()).slice(-2);
+          var mn = ('00'+dt.getMinutes()).slice(-2);
+          var sc = ('00'+dt.getSeconds()).slice(-2);
+          var cd = hari[dt.getDay()];
+          // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+          var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+          var timestamp = hr + ":" + mn + ":" + sc;
+
+          var cetakan = 'Berhasil';
+          var head_unik = "{left}-{br}";
+          var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+          var separator = "--------------------------------{br}";
+          var separator_unik = "-- -------------------------- --{br}";
+          // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+          var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
+
+          // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+          var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}AMOUNT   : " + result.NOMINAL.toLocaleString("id-ID") + "{br}SALDO    : " + result.saldo_baru.toLocaleString("id-ID") + "{br}";
+          var thanks = "{center}- Terima Kasih -{br}";
+          var eol = "{br}{br}{br}";
+
+          cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
+          // console.log(cetakan);
+    
+          window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+            app.toast.create({
+              text: "Setoran Berhasil",
+              closeTimeout: 3000,
+              closeButton: true
+            }).open();
+            app.views.main.router.refreshPage();
+          }, function() {
+            alert("Gagal mencetak");
+          });
+    
+        },
+        function() {
+          alert("Tidak dapat tersambung ke printer");
+          
+        });
+      },
+      function (error) {
+        alert("Tidak ditemukan perangkat printer")
+      });
+    }
+  });
+}
+
+function printUlangSetoran(){
+  if(gagal_print){
+
+    $.ajax({
+      url: site+"/API/setoran/"+gagal_print+"/",
+      method: "GET",
+      success: function(json){
+        var result = json[0];
+        var dt = new Date();
+        var yr = dt.getFullYear();
+        var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+        var dy = ('00'+dt.getDate()).slice(-2);
+        var hr = ('00'+dt.getHours()).slice(-2);
+        var mn = ('00'+dt.getMinutes()).slice(-2);
+        var sc = ('00'+dt.getSeconds()).slice(-2);
+        var cd = hari[dt.getDay()];
+        // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+        var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+        var timestamp = hr + ":" + mn + ":" + sc;
+
+        var cetakan = 'Berhasil';
+        var head_unik = "{left}-{br}";
+        var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+        var separator = "--------------------------------{br}";
+        var separator_unik = "-- -------------------------- --{br}";
+        // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+        var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
+
+        // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+        var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}AMOUNT   : " + result.NOMINAL.toLocaleString("id-ID") + "{br}SALDO    : " + result.saldo_baru.toLocaleString("id-ID") + "{br}";
+        var thanks = "{center}- Terima Kasih -{br}";
+        var eol = "{br}{br}{br}";
+
+        cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
+        // console.log(cetakan);
+        // window.DatecsPrinter.listBluetoothDevices(function (devices) {
+          // window.DatecsPrinter.connect(devices[0].address, function() {
+            
+      
+            window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+              app.toast.create({
+                text: "Cetak Ulang Receipt Setoran Berhasil",
+                closeTimeout: 3000,
+                closeButton: true
+              }).open();
+            }, function() {
+              alert("Gagal Mencetak, Proses Dibatalkan");
+            });
+      
+          // },
+          // function() {
+          //   alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
+            
+          // });
+        // },
+        // function (error) {
+          
+        // });
+      }
+    });
+  } else {
+    app.toast.create({
+      text: "Belum Terjadi Proses Setoran, Tidak Ada Yang Bisa Diprint",
+      closeTimeout: 3000,
+      closeButton: true
+    }).open();
+  }
+}
+
+
+/* function previewSetoran(temp){
   to_be_printed = temp;
   var dt = new Date();
   var yr = dt.getFullYear();
@@ -366,9 +527,9 @@ function previewSetoran(temp){
   to_be_previewed = cetakan;
 
   app.views.main.router.navigate('/preview/');
-}
+} */
 
-function printSetoran(temp){
+/* function printSetoran(temp){
   gagal_print = temp;
   window.DatecsPrinter.listBluetoothDevices(function (devices) {
     window.DatecsPrinter.connect(devices[0].address, function() {
@@ -401,119 +562,68 @@ function printSetoran(temp){
       var eol = "{br}{br}{br}";
 
       cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
-      $.ajax({
-        url: site+"/API/setoran/",
-        method: "POST",
-        data: JSON.stringify(temp),
-        success: function(){
-          window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
-            app.toast.create({
-              text: "Setoran Berhasil",
-              closeTimeout: 3000,
-              closeButton: true
-            }).open();
-            app.views.main.router.refreshPage();
-          }, function() {
-            alert("Gagal Mencetak, Proses Dibatalkan");
-          });
-        }
-      })
-        // printBayar(q);
+
+      window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+        app.toast.create({
+          text: "Setoran Berhasil",
+          closeTimeout: 3000,
+          closeButton: true
+        }).open();
+        app.views.main.router.refreshPage();
+      }, function() {
+        alert("Gagal Mencetak, Proses Dibatalkan");
+      });
+
     },
     function() {
       alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
-      // alert(JSON.stringify(error));
+      
     });
   },
   function (error) {
-    // alert(JSON.stringify(error));
+    
   });
-}
+} */
+
+
 
 function posting(){
   $('#proses_posting').addClass('disabled');
   var tot_posting = tot_simpanan + tot_pinjaman;
   var temp = {
-    jenis_print : "posting",
     act : "posting",
     user : iduser,
-    simpanan : tot_simpanan,
-    pinjaman : tot_pinjaman,
-    total : tot_posting,
-    cabang : $('#cabang').val()
+    cabang : $('#cabang').val(),
+    TOKEN : token
   }
-
+  
   $.ajax({
-    url: site+"/API/trans/posting/",
-    method: "GET",
+    url: site+"/API/posting/",
+    method: "POST",
+    data: JSON.stringify(temp),
     success: function(result){
-      temp.trans = result.trans;
-      printPosting(temp);
-      // bypassPosting(temp);
-      // previewPosting(temp);
+      if(result[0].RESULT == '1'){
+        token = result[0].TOKEN_BARU;
+
+        // printPosting(result[0].TOKEN_LAMA);
+        previewPosting(result[0].TOKEN_LAMA);
+
+        alert('sukses');
+      } else if(result[0].RESULT == '2') {
+        alert("gagal");
+      } else {
+        alert("tidak diketahui");
+      }
     }
   })
 }
 
-function previewPosting(temp){
-  to_be_printed = temp;
-  var dt = new Date();
-  var yr = dt.getFullYear();
-  var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
-  var dy = ('00'+dt.getDate()).slice(-2);
-  var hr = ('00'+dt.getHours()).slice(-2);
-  var mn = ('00'+dt.getMinutes()).slice(-2);
-  var sc = ('00'+dt.getSeconds()).slice(-2);
-  var cd = hari[dt.getDay()];
-  // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
-  var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
-  var timestamp = hr + ":" + mn + ":" + sc;
-  var jeni_detil = '';
+function printPosting(token){
 
-  var cetakan = 'Berhasil';
-  var table_head = '<table style="width: 100%;"><tr><th style="width: 45%"></th><th style="width: 10%"></th><th style="width: 45%"></th></tr>';
-
-  var kop = '<tr><td colspan="3" style="text-align: center;">PT BPR BANK SLEMAN (PERSERODA)</td></tr><tr><td colspan="3" style="text-align: center;">Magelang KM10 Tridadi Sleman</td></tr><tr><td colspan="3" style="text-align: center;">Telp (0274)868321</td></tr>';
-  // var kop = "{br}{center} PD BPR BANK SLEMAN{br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
-
-  var separator = '<tr><td colspan="3" style="border-top: dashed black 2px"></td></tr>';
-  // var separator = "--------------------------------{br}";
-
-  // var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SIMP</td><td>:</td><td>'+temp.simpanan.toLocaleString('id-ID')+'</td></tr><tr><td>TOT PINJ</td><td>:</td><td>'+temp.pinjaman.toLocaleString('id-ID')+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
-  var post = '<tr><td colspan="3">REKAP POSTING HARIAN</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.user+'</td></tr><tr><td>NO</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>HARI/TGL</td><td>:</td><td>'+datestamp+'</td></tr><tr><td>JAM</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>TOT SETOR</td><td>:</td><td>'+temp.total.toLocaleString('id-ID')+'</td></tr>';
-  // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
-
-  var detil = '<tr><td>CIF</td><td>:</td><td>'+temp.cif+'</td></tr><tr><td>NAMA</td><td>:</td><td>'+temp.nama+'</td></tr><tr><td>OPR</td><td>:</td><td>'+iduser+'</td></tr>';
-  // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
-
-  var jeni_head = '<tr><td colspan="3"><table style="width: 100%;"><tr><th style="width: 30%; text-align: left;">CIF</th><th style="width: 30%; text-align: left;">JENIS</th><th style="width: 40%; text-align: right;">NOMINAL</th></tr>';
-  var jeni_end = '</table></td></tr>';
-  // var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
-
-  for(var i = 0; i < po_simpanan.length; i++){
-    jeni_detil += '<tr><td>'+po_simpanan[i].cif+'</td><td>'+po_simpanan[i].rek+'</td><td style="text-align: right;">'+po_simpanan[i].nominal.toLocaleString('id-ID')+'</td></tr>';
-    // jeni_detil += po_simpanan[i].cif + "   " + po_simpanan[i].rek + "   " + lpad(po_simpanan[i].nominal.toLocaleString("id-ID"), 10, ' ') + "{br}";
-  }
-
-  // var setor = '<tr><td colspan="3">SETOR TUNAI</td></tr><tr><td>TANGGAL</td><td>:</td><td>'+timestamp+'</td></tr><tr><td>NO TRANS</td><td>:</td><td>'+temp.trans+'</td></tr><tr><td>REK</td><td>:</td><td>'+temp.rek+'</td></tr><tr><td>AMOUNT</td><td>:</td><td>'+temp.nominal.toLocaleString("id-ID")+'</td></tr><tr><td>SALDO</td><td>:</td><td>'+temp.saldo.toLocaleString("id-ID")+'</td></tr>';
-  // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
-
-  var thanks = '<tr><td colspan="3" style="text-align: center;">- Terima Kasih -</td></tr>';
-  // var thanks = "{center}- Terima Kasih -{br}";
-  var eol = "{br}{br}{br}";
-  var table_end = '</table><br><br>';
-
-  cetakan = table_head + kop + separator + post + separator + jeni_head + jeni_detil + jeni_end + separator + thanks + table_end;
-  to_be_previewed = cetakan;
-  // cetakan = kop + separator + post + separator + jeni + jeni_detil + separator + thanks + eol;
-
-  app.views.main.router.navigate('/preview/');
-}
-
-function printPosting(temp){
-
-  window.DatecsPrinter.listBluetoothDevices(function (devices) {
-    window.DatecsPrinter.connect(devices[0].address, function() {
+  $.ajax({
+    url: site+"/API/print/"+token+"/",
+    method: "GET",
+    success: function(result){
       var dt = new Date();
       var yr = dt.getFullYear();
       var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
@@ -521,10 +631,7 @@ function printPosting(temp){
       var hr = ('00'+dt.getHours()).slice(-2);
       var mn = ('00'+dt.getMinutes()).slice(-2);
       var sc = ('00'+dt.getSeconds()).slice(-2);
-      var cd = hari[dt.getDay()];
-      // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
-      var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
-      var timestamp = hr + ":" + mn + ":" + sc;
+      var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
 
       var cetakan = 'Berhasil';
       var head_unik = "{left}-{br}";
@@ -533,86 +640,155 @@ function printPosting(temp){
       var separator_unik = "-- -------------------------- --{br}";
       // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
 
-      // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
-      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}HARI/TGL  : " + datestamp + "{br}JAM       : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
-
+      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + result[0].ID_USER + "{br}NO        : " + result[0].NO_TRANSAKSI + "{br}TANGGAL   : " + result[0].TANGGAL.replace(/\-/g, '/') + "{br}TOT SIMP  : " + parseInt(result[0].SIMPANAN).toLocaleString("id-ID") + "{br}TOT PINJ  : " + parseInt(result[0].PINJAMAN).toLocaleString("id-ID") + "{br}TOT SETOR : " + parseInt(result[0].TOTAL).toLocaleString("id-ID") + "{br}";
       var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
       var thanks = "{center}- Terima Kasih -{br}";
       var eol = "{br}{br}{br}";
 
       var jeni_detil = '';
       var c = '1000000000';
-      for(var i = 0; i < po_simpanan.length; i++){
-        jeni_detil += po_simpanan[i].cif + "   " + po_simpanan[i].rek + "   " + lpad(po_simpanan[i].nominal.toLocaleString("id-ID"), 10, ' ') + "{br}";
+      for(var i = 0; i < result.length; i++){
+        jeni_detil += result[i].NO_ANGGOTA + "   " + result[i].ID_SIMPANAN + "   " + lpad(parseInt(result[i].NOMINAL).toLocaleString("id-ID"), 10, ' ') + "{br}";
       }
 
       cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
+      // console.log(cetakan);
 
-      for(var i = 0; i < idx.length; i++){
-        var upd = {
-          act : "update",
-          idx : idx[i]
-        };
-
-        $.ajax({
-          url: site+"/API/setoran/",
-          method: "POST",
-          data: JSON.stringify(upd),
-          success: function(){
-            console.log("Update IDX " + upd.idx + " sukses.");
-          }
-        })
-      }
-
-      $.ajax({
-        url: site+"/API/posting/",
-        method: "POST",
-        data: JSON.stringify(temp),
-        success: function(result){
-          for(var i = 0; i < idx.length; i++){
-            var upd = {
-              act : "dtlpost",
-              idx : idx[i],
-              id_posting : result.id
-            }
-
-            $.ajax({
-              url: site+"/API/posting/",
-              method: "POST",
-              data: JSON.stringify(upd),
-              success: function(){
-                // console.log("Update IDX " + upd.idx + " sukses.");
-              }
-            })
-          }
-
+      window.DatecsPrinter.listBluetoothDevices(function (devices) {
+        window.DatecsPrinter.connect(devices[0].address, function() {
           window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
             app.toast.create({
               text: "Posting Harian Berhasil",
               closeTimeout: 3000,
               closeButton: true
             }).open();
-    
-            // idx = [];
-            // po_simpanan = [];
             app.views.main.router.navigate('/cif/');
           }, function() {
             alert("Gagal Mencetak, Proses Dibatalkan");
             // alert(JSON.stringify(error));
           });
+            // printBayar(q);
+        },
+        function() {
+          alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
+          // alert(JSON.stringify(error));
+        });
+      },
+      function (error) {
+        // alert(JSON.stringify(error));
+      });
+    }
+  })
+
+  // window.DatecsPrinter.listBluetoothDevices(function (devices) {
+  //   window.DatecsPrinter.connect(devices[0].address, function() {
+  //     var dt = new Date();
+  //     var yr = dt.getFullYear();
+  //     var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+  //     var dy = ('00'+dt.getDate()).slice(-2);
+  //     var hr = ('00'+dt.getHours()).slice(-2);
+  //     var mn = ('00'+dt.getMinutes()).slice(-2);
+  //     var sc = ('00'+dt.getSeconds()).slice(-2);
+  //     var cd = hari[dt.getDay()];
+  //     // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+  //     var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+  //     var timestamp = hr + ":" + mn + ":" + sc;
+
+  //     var cetakan = 'Berhasil';
+  //     var head_unik = "{left}-{br}";
+  //     var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+  //     var separator = "--------------------------------{br}";
+  //     var separator_unik = "-- -------------------------- --{br}";
+  //     // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+
+  //     // var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}TANGGAL   : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
+  //     var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + temp.user + "{br}NO        : " + temp.trans + "{br}HARI/TGL  : " + datestamp + "{br}JAM       : " + timestamp + "{br}TOT SIMP  : " + temp.simpanan.toLocaleString("id-ID") + "{br}TOT PINJ  : " + temp.pinjaman.toLocaleString("id-ID") + "{br}TOT SETOR : " + temp.total.toLocaleString("id-ID") + "{br}";
+
+  //     var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
+  //     var thanks = "{center}- Terima Kasih -{br}";
+  //     var eol = "{br}{br}{br}";
+
+  //     var jeni_detil = '';
+  //     var c = '1000000000';
+  //     for(var i = 0; i < po_simpanan.length; i++){
+  //       jeni_detil += po_simpanan[i].cif + "   " + po_simpanan[i].rek + "   " + lpad(po_simpanan[i].nominal.toLocaleString("id-ID"), 10, ' ') + "{br}";
+  //     }
+
+  //     cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
+  //     window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+  //       app.toast.create({
+  //         text: "Posting Harian Berhasil",
+  //         closeTimeout: 3000,
+  //         closeButton: true
+  //       }).open();
+  //       app.views.main.router.navigate('/cif/');
+  //     }, function() {
+  //       alert("Gagal Mencetak, Proses Dibatalkan");
+  //     });
+
+  //     /* for(var i = 0; i < idx.length; i++){
+  //       var upd = {
+  //         act : "update",
+  //         idx : idx[i]
+  //       };
+
+  //       $.ajax({
+  //         url: site+"/API/setoran/",
+  //         method: "POST",
+  //         data: JSON.stringify(upd),
+  //         success: function(){
+  //           console.log("Update IDX " + upd.idx + " sukses.");
+  //         }
+  //       })
+  //     } */
+
+  //     /* $.ajax({
+  //       url: site+"/API/posting/",
+  //       method: "POST",
+  //       data: JSON.stringify(temp),
+  //       success: function(result){
+  //         for(var i = 0; i < idx.length; i++){
+  //           var upd = {
+  //             act : "dtlpost",
+  //             idx : idx[i],
+  //             id_posting : result.id
+  //           }
+
+  //           $.ajax({
+  //             url: site+"/API/posting/",
+  //             method: "POST",
+  //             data: JSON.stringify(upd),
+  //             success: function(){
+  //               // console.log("Update IDX " + upd.idx + " sukses.");
+  //             }
+  //           })
+  //         }
+
+  //         window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+  //           app.toast.create({
+  //             text: "Posting Harian Berhasil",
+  //             closeTimeout: 3000,
+  //             closeButton: true
+  //           }).open();
+    
+  //           // idx = [];
+  //           // po_simpanan = [];
+  //           app.views.main.router.navigate('/cif/');
+  //         }, function() {
+  //           alert("Gagal Mencetak, Proses Dibatalkan");
+  //           // alert(JSON.stringify(error));
+  //         });
           
-        }
-      })
-      // printBayar(q);
-    },
-    function() {
-      alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
-      // alert(JSON.stringify(error));
-    });
-  },
-  function (error) {
-    // alert(JSON.stringify(error));
-  });
+  //       }
+  //     }) */
+  //     // printBayar(q);
+  //   },
+  //   function() {
+  //     alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
+  //   });
+  // },
+  // function (error) {
+  // });
 }
 
 function laporanReport(){
@@ -686,7 +862,7 @@ function laporanReport(){
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].SIMPANAN).toLocaleString('id-ID') +'</td>\
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].PINJAMAN).toLocaleString('id-ID') +'</td>\
                           <td style="text-align: right; padding: 10px 0;">'+ parseInt(result[i].TOTAL).toLocaleString('id-ID') +'</td>\
-                          <td ><a onclick="printUlang('+ result[i].ID_POSTING +')">Print</a></td>\
+                          <td ><a onclick="printUlang('+ result[i].TOKEN +')">Print</a></td>\
             ';
 
             total_s += parseInt(result[i].SIMPANAN);
@@ -1038,9 +1214,9 @@ function ubahPass(){
   }
 }
 
-function printUlang(id){
+function printUlang(token){
   $.ajax({
-    url: site+"/API/print/"+id+"/",
+    url: site+"/API/print/"+token+"/",
     method: "GET",
     success: function(result){
       var dt = new Date();
@@ -1099,61 +1275,82 @@ function printUlang(id){
   })
 }
 
-function printUlangSetoran(){
-  if(gagal_print){
 
-    window.DatecsPrinter.listBluetoothDevices(function (devices) {
-      window.DatecsPrinter.connect(devices[0].address, function() {
-        var dt = new Date();
-        var yr = dt.getFullYear();
-        var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
-        var dy = ('00'+dt.getDate()).slice(-2);
-        var hr = ('00'+dt.getHours()).slice(-2);
-        var mn = ('00'+dt.getMinutes()).slice(-2);
-        var sc = ('00'+dt.getSeconds()).slice(-2);
-        var cd = hari[dt.getDay()];
-        // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
-        var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
-        var timestamp = hr + ":" + mn + ":" + sc;
-  
-        var cetakan = 'Berhasil';
-        var head_unik = "{left}-{br}";
-        var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
-        var separator = "--------------------------------{br}";
-        var separator_unik = "-- -------------------------- --{br}";
-        // var detil = "{left}CIF  : " + gagal_print.cif + "{br}NAMA : " + gagal_print.nama + "{br}OPR  : " + iduser + "{br}";
-        var detil = "{left}NAMA : " + gagal_print.nama + "{br}OPR  : " + iduser + "{br}";
-  
-        // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + gagal_print.trans + "{br}REK      : " + gagal_print.rek + "{br}AMOUNT   : " + gagal_print.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + gagal_print.saldo.toLocaleString("id-ID") + "{br}";
-        var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + gagal_print.datestamp + "{br}JAM      : " + gagal_print.timestamp + "{br}NO TRANS : " + gagal_print.trans + "{br}REK      : " + gagal_print.rek + "{br}AMOUNT   : " + gagal_print.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + gagal_print.saldo.toLocaleString("id-ID") + "{br}";
-        var thanks = "{center}- Terima Kasih -{br}";
-        var eol = "{br}{br}{br}";
-  
-        cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
-        window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
-          app.toast.create({
-            text: "Cetak Ulang Receipt Setoran Berhasil",
-            closeTimeout: 3000,
-            closeButton: true
-          }).open();
-          // app.views.main.router.refreshPage();
-        }, function() {
-          alert("Gagal Mencetak Ulang");
-        });
-      },
-      function() {
-        alert("Tidak Dapat Tersambung Ke Printer, Proses Dibatalkan");
-        // alert(JSON.stringify(error));
-      });
-    },
-    function (error) {
-      // alert(JSON.stringify(error));
-    });
-  } else {
-    app.toast.create({
-      text: "Belum Terjadi Proses Setoran, Tidak Ada Yang Bisa Diprint",
-      closeTimeout: 3000,
-      closeButton: true
-    }).open();
-  }
+
+
+
+// FOR DEBUGGING
+function previewSetoran(idx){
+  $.ajax({
+    url: site+"/API/setoran/"+idx+"/",
+    method: "GET",
+    success: function(json){
+      var result = json[0];
+      var dt = new Date();
+      var yr = dt.getFullYear();
+      var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+      var dy = ('00'+dt.getDate()).slice(-2);
+      var hr = ('00'+dt.getHours()).slice(-2);
+      var mn = ('00'+dt.getMinutes()).slice(-2);
+      var sc = ('00'+dt.getSeconds()).slice(-2);
+      var cd = hari[dt.getDay()];
+      // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+      var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+      var timestamp = hr + ":" + mn + ":" + sc;
+
+      var cetakan = 'Berhasil';
+      var head_unik = "{left}-{br}";
+      var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var separator = "--------------------------------{br}";
+      var separator_unik = "-- -------------------------- --{br}";
+      // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+      var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
+
+      // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+      var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}AMOUNT   : " + result.NOMINAL.toLocaleString("id-ID") + "{br}SALDO    : " + result.saldo_baru.toLocaleString("id-ID") + "{br}";
+      var thanks = "{center}- Terima Kasih -{br}";
+      var eol = "{br}{br}{br}";
+
+      cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
+      console.log(cetakan);
+    }
+  });
+}
+
+function previewPosting(token){
+  $.ajax({
+    url: site+"/API/print/"+token+"/",
+    method: "GET",
+    success: function(result){
+      var dt = new Date();
+      var yr = dt.getFullYear();
+      var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+      var dy = ('00'+dt.getDate()).slice(-2);
+      var hr = ('00'+dt.getHours()).slice(-2);
+      var mn = ('00'+dt.getMinutes()).slice(-2);
+      var sc = ('00'+dt.getSeconds()).slice(-2);
+      var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+
+      var cetakan = 'Berhasil';
+      var head_unik = "{left}-{br}";
+      var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+      var separator = "--------------------------------{br}";
+      var separator_unik = "-- -------------------------- --{br}";
+      // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+
+      var post = "{left}REKAP POSTING HARIAN{br}NAMA      : " + result[0].ID_USER + "{br}NO        : " + result[0].NO_TRANSAKSI + "{br}TANGGAL   : " + result[0].TANGGAL.replace(/\-/g, '/') + "{br}TOT SIMP  : " + parseInt(result[0].SIMPANAN).toLocaleString("id-ID") + "{br}TOT PINJ  : " + parseInt(result[0].PINJAMAN).toLocaleString("id-ID") + "{br}TOT SETOR : " + parseInt(result[0].TOTAL).toLocaleString("id-ID") + "{br}";
+      var jeni = "{left}  CIF      JENIS        NOMINAL{br}";
+      var thanks = "{center}- Terima Kasih -{br}";
+      var eol = "{br}{br}{br}";
+
+      var jeni_detil = '';
+      var c = '1000000000';
+      for(var i = 0; i < result.length; i++){
+        jeni_detil += result[i].NO_ANGGOTA + "   " + result[i].ID_SIMPANAN + "   " + lpad(parseInt(result[i].NOMINAL).toLocaleString("id-ID"), 10, ' ') + "{br}";
+      }
+
+      cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
+      console.log(cetakan);
+    }
+  })
 }
