@@ -11,6 +11,8 @@ var app = new Framework7({
   routes: routes,
 });
 
+var appVer = 0;
+
 document.addEventListener('deviceready', function() {
   app.init();
 
@@ -24,6 +26,10 @@ document.addEventListener('deviceready', function() {
   document.addEventListener("backbutton", onBackPressed, false);
   document.addEventListener("touchend", onTouchEnd, false);
   document.addEventListener("touchstart", onTouchStart, false);
+  cordova.getAppVersion.getVersionNumber(function (version) {
+    appVer = version;
+    $('#appversion').html(version);
+  });
 });
 
 // var site = 'http://mcollection.cloudmnm.com';
@@ -55,6 +61,8 @@ function onNewLogin(form){
     temp[this.name] = this.value;
   })
 
+  temp["version"] = appVer;
+
   $.ajax({
     url: site+"/API/login/",
     data: JSON.stringify(temp),
@@ -62,34 +70,55 @@ function onNewLogin(form){
     success: function(result){
       console.log(result);
       if(result.length > 0){
-        iduser = result[0].USERNAME;
-        timeout_dur = result[0].timeout;
-        session_token = result[0].token;
-        listCabang = result[0].cabang;
-        idrole = result[0].ID_ROLE;
-        st1 = result[0].st1;
-        st2 = result[0].st2;
-        token = result[0].TOKEN_TRANS;
-        limit_harian = parseInt(result[0].limit_harian);
-        logout_timer = setTimeout(function(){
-         // alert("Hello");
-         onLogout(1);
-        }, timeout_dur * 1000 * 60);
+        if(result[0].RESULT == 1){
+          iduser = result[0].USERNAME;
+          timeout_dur = result[0].timeout;
+          session_token = result[0].token;
+          listCabang = result[0].cabang;
+          idrole = result[0].ID_ROLE;
+          st1 = result[0].st1;
+          st2 = result[0].st2;
+          token = result[0].TOKEN_TRANS;
+          limit_harian = parseInt(result[0].limit_harian);
 
-        if(result[0].ID_ROLE == 2){
-          $('#divider_utama').css('display', 'block');
-          $('#menu_collection').css('display', 'block');
-          $('#menu_posting').css('display', 'block');
-          app.views.main.router.navigate('/coll_simpanan/');
+          logout_timer = setTimeout(function(){
+            // alert("Hello");
+            onLogout(1);
+          }, timeout_dur * 1000 * 60);
+  
+          if(result[0].ID_ROLE == 2){
+            $('#divider_utama').css('display', 'block');
+            $('#menu_collection').css('display', 'block');
+            $('#menu_posting').css('display', 'block');
+            app.views.main.router.navigate('/coll_simpanan/');
+          } else {
+            jenis_laporan = 'saving';
+            app.views.main.router.navigate('/report_s/');
+          }
+  
+          cekSession();
+        } else if(result[0].RESULT == 2) {
+          app.toast.create({
+            text: "Cek lagi username / password anda",
+            closeTimeout: 3000,
+            closeButton: true
+          }).open();
+        } else if(result[0].RESULT == 3){
+          app.toast.create({
+            text: "Harap melakukan pembaruan aplikasi",
+            closeTimeout: 3000,
+            closeButton: true
+          }).open();
         } else {
-          jenis_laporan = 'saving';
-          app.views.main.router.navigate('/report_s/');
+          app.toast.create({
+            text: "Error tidak diketahui",
+            closeTimeout: 3000,
+            closeButton: true
+          }).open();
         }
-
-        cekSession();
       } else {
         app.toast.create({
-          text: "Cek lagi username / password anda",
+          text: "Tidak mendapat respons dari server, harap coba lagi",
           closeTimeout: 3000,
           closeButton: true
         }).open();
@@ -107,6 +136,8 @@ function onLogout(t){
   iduser = '';
   clearTimeout(session_checker);
   app.views.main.router.navigate('/');
+
+  $('#appversion').html(appVer);
   
   switch(t){
     case 0:
@@ -144,6 +175,14 @@ function onLogout(t){
     case 4:
       app.toast.create({
         text: "Password Telah Berhasil Diperbarui. Silahkan Login Ulang",
+        closeTimeout: 3000,
+        closeButton: true
+      }).open();
+      break;
+
+    case 5:
+      app.toast.create({
+        text: "Harap Melakukan Pembaruan Aplikasi Dahulu!",
         closeTimeout: 3000,
         closeButton: true
       }).open();
