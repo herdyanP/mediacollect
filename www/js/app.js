@@ -32,8 +32,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-// var site = 'http://mcollection.cloudmnm.com';
-var site = 'http://mcollection.cloudmnm.com/dev';
+var site = 'http://mcollection.cloudmnm.com';
+// var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -104,11 +104,13 @@ function onNewLogin(form){
             closeButton: true
           }).open();
         } else if(result[0].RESULT == 3){
-          app.toast.create({
-            text: "Harap melakukan pembaruan aplikasi",
-            closeTimeout: 3000,
-            closeButton: true
-          }).open();
+          // app.toast.create({
+          //   text: "Harap melakukan pembaruan aplikasi",
+          //   closeTimeout: 3000,
+          //   closeButton: true
+          // }).open();
+          alert("Aplikasi terbaru ditemukan");
+          window.open(result[0].LINK, "_blank");
         } else {
           app.toast.create({
             text: "Error tidak diketahui",
@@ -181,11 +183,13 @@ function onLogout(t){
       break;
 
     case 5:
-      app.toast.create({
-        text: "Harap Melakukan Pembaruan Aplikasi Dahulu!",
-        closeTimeout: 3000,
-        closeButton: true
-      }).open();
+      // app.toast.create({
+      //   text: "Harap Melakukan Pembaruan Aplikasi Dahulu!",
+      //   closeTimeout: 3000,
+      //   closeButton: true
+      // }).open();
+      alert("Aplikasi terbaru ditemukan");
+      window.open(result[0].LINK, "_blank");
       break;
   }
 }
@@ -352,8 +356,8 @@ function proses(jenis, cif, rek, nama, sal, limit){
 
                   dialog.close();
 
-                  previewSetoran(result[0].idx);
-                  // printSetoran(result[0].idx);
+                  // previewSetoran(result[0].idx);
+                  printSetoran(result[0].idx);
 
                   app.views.main.router.refreshPage();
                 } else if(result[0].RESULT == "2"){
@@ -644,8 +648,8 @@ function posting(){
       if(result[0].RESULT == '1'){
         token = result[0].TOKEN_BARU;
 
-        // printPosting(result[0].TOKEN_LAMA);
-        previewPosting(result[0].TOKEN_LAMA);
+        printPosting(result[0].TOKEN_LAMA);
+        // previewPosting(result[0].TOKEN_LAMA);
 
         alert('sukses');
       } else if(result[0].RESULT == '2') {

@@ -4,7 +4,12 @@ var routes =
     path: '/',
     url: './index.html',
     name: 'login',
-    history: false
+    history: false,
+    on: {
+      pageAfterIn: function(){
+        $('#appversion').html(appVer);
+      }
+    }
   },
   {
     path: '/home/',
