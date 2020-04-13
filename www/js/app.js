@@ -109,9 +109,8 @@ function onNewLogin(form){
           //   closeTimeout: 3000,
           //   closeButton: true
           // }).open();
-          alert('Versi terbaru ditemukan di server. Aplikasi akan melakukan pembaruan');
-          window.open(result[0].LINK,'_blank');
-          // $('#download').attr("href", result[0].LINK);
+          alert("Aplikasi terbaru ditemukan");
+          window.open(result[0].LINK, "_blank");
         } else {
           app.toast.create({
             text: "Error tidak diketahui",
@@ -182,11 +181,13 @@ function onLogout(t){
       break;
 
     case 5:
-      app.toast.create({
-        text: "Harap Melakukan Pembaruan Aplikasi Dahulu!",
-        closeTimeout: 3000,
-        closeButton: true
-      }).open();
+      // app.toast.create({
+      //   text: "Harap Melakukan Pembaruan Aplikasi Dahulu!",
+      //   closeTimeout: 3000,
+      //   closeButton: true
+      // }).open();
+      alert("Aplikasi terbaru ditemukan");
+      window.open(result[0].LINK, "_blank");
       break;
   }
 }
@@ -353,8 +354,8 @@ function proses(jenis, cif, rek, nama, sal, limit){
 
                   dialog.close();
 
-                  previewSetoran(result[0].idx);
-                  // printSetoran(result[0].idx);
+                  // previewSetoran(result[0].idx);
+                  printSetoran(result[0].idx);
 
                   app.views.main.router.refreshPage();
                 } else if(result[0].RESULT == "2"){
@@ -397,13 +398,13 @@ function proses(jenis, cif, rek, nama, sal, limit){
 
 function printSetoran(idx){
   gagal_print = idx;
-
-  $.ajax({
-    url: site+"/API/setoran/"+idx+"/",
-    method: "GET",
-    success: function(json){
-      window.DatecsPrinter.listBluetoothDevices(function (devices) {
-        window.DatecsPrinter.connect(devices[0].address, function() {
+  
+  window.DatecsPrinter.listBluetoothDevices(function (devices) {
+    window.DatecsPrinter.connect(devices[0].address, function() {
+      $.ajax({
+        url: site+"/API/setoran/"+idx+"/",
+        method: "GET",
+        success: function(json){
           var result = json[0];
           var dt = new Date();
           var yr = dt.getFullYear();
@@ -432,7 +433,7 @@ function printSetoran(idx){
 
           cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
           // console.log(cetakan);
-    
+
           window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
             app.toast.create({
               text: "Setoran Berhasil",
@@ -443,18 +444,72 @@ function printSetoran(idx){
           }, function() {
             alert("Gagal mencetak");
           });
-    
-        },
-        function() {
-          alert("Tidak dapat tersambung ke printer");
-          
-        });
-      },
-      function (error) {
-        alert("Tidak ditemukan perangkat printer")
+        }
       });
-    }
-  });
+    }, function() {
+      alert("Tidak dapat tersambung ke printer");
+    });
+  }, function(){
+    alert("Tidak ditemukan perangkat printer")
+  })
+
+//   $.ajax({
+//     url: site+"/API/setoran/"+idx+"/",
+//     method: "GET",
+//     success: function(json){
+//       window.DatecsPrinter.listBluetoothDevices(function (devices) {
+//         window.DatecsPrinter.connect(devices[0].address, function() {
+//           var result = json[0];
+//           var dt = new Date();
+//           var yr = dt.getFullYear();
+//           var mt = ('00'+(dt.getMonth() + 1)).slice(-2);
+//           var dy = ('00'+dt.getDate()).slice(-2);
+//           var hr = ('00'+dt.getHours()).slice(-2);
+//           var mn = ('00'+dt.getMinutes()).slice(-2);
+//           var sc = ('00'+dt.getSeconds()).slice(-2);
+//           var cd = hari[dt.getDay()];
+//           // var timestamp = dy + "/" + mt + "/" + yr + " " + hr + ":" + mn + ":" + sc;
+//           var datestamp = cd + ", " + dy + "/" + mt + "/" + yr;
+//           var timestamp = hr + ":" + mn + ":" + sc;
+
+//           var cetakan = 'Berhasil';
+//           var head_unik = "{left}-{br}";
+//           var kop = "{br}{center}PT BPR BANK SLEMAN (PERSERODA){br}Jl Magelang KM10 Tridadi Sleman{br}Telp (0274) 868321{br}";
+//           var separator = "--------------------------------{br}";
+//           var separator_unik = "-- -------------------------- --{br}";
+//           // var detil = "{left}CIF  : " + temp.cif + "{br}NAMA : " + temp.nama + "{br}OPR  : " + iduser + "{br}";
+//           var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
+
+//           // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
+//           var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}AMOUNT   : " + result.NOMINAL.toLocaleString("id-ID") + "{br}SALDO    : " + result.saldo_baru.toLocaleString("id-ID") + "{br}";
+//           var thanks = "{center}- Terima Kasih -{br}";
+//           var eol = "{br}{br}{br}";
+
+//           cetakan = head_unik + kop + separator + detil + separator + setor + separator_unik + thanks + eol;
+//           // console.log(cetakan);
+    
+//           window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
+//             app.toast.create({
+//               text: "Setoran Berhasil",
+//               closeTimeout: 3000,
+//               closeButton: true
+//             }).open();
+//             app.views.main.router.refreshPage();
+//           }, function() {
+//             alert("Gagal mencetak");
+//           });
+    
+//         },
+//         function() {
+//           alert("Tidak dapat tersambung ke printer");
+          
+//         });
+//       },
+//       function (error) {
+//         alert("Tidak ditemukan perangkat printer")
+//       });
+//     }
+//   });
 }
 
 function printUlangSetoran(){
@@ -645,8 +700,8 @@ function posting(){
       if(result[0].RESULT == '1'){
         token = result[0].TOKEN_BARU;
 
-        // printPosting(result[0].TOKEN_LAMA);
-        previewPosting(result[0].TOKEN_LAMA);
+        printPosting(result[0].TOKEN_LAMA);
+        // previewPosting(result[0].TOKEN_LAMA);
 
         alert('sukses');
       } else if(result[0].RESULT == '2') {
