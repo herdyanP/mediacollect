@@ -295,112 +295,227 @@ function cekCIF(src, cif){
   }
 }
 
-function proses(jenis, cif, rek, nama, sal, limit){
-  app.dialog.create({
-    title: 'Setoran',
-    closeByBackdropClick: false,
-    content: 
-      '<div class="list no-hairlines no-hairlines-between">\
-        <ul>\
-          <li class="item-content item-input">\
-            <div class="item-inner">\
-              <div class="item-input-wrap">\
-                <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
-              </div>\
-            </div>\
-          </li>\
-        </ul>\
-      </div>',
-    buttons: [
-    {
-      text: 'Batal',
-      onClick: function(dialog, e){
-        dialog.close();
-      }
-    },{
-      text: 'Simpan',
-      onClick: function(dialog, e){
-        // if(st1 > 0 && st2 > 0){
-          var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
-          var saldo = sal.replace(/\D/g,'');
-          var newsaldo = parseInt(saldo) + parseInt(nominal);
-          var temp = {
-            act : "insert",
-            jenis_print : "setoran",
-            jenis : jenis,
-            cif : cif,
-            rek : rek,
-            nominal : nominal,
-            nama : nama,
-            user : iduser,
-            saldo : newsaldo,
-            TOKEN : token
-          }
+// function proses(jenis, cif, rek, nama, sal, limit){
+//   app.dialog.create({
+//     title: 'Setoran',
+//     closeByBackdropClick: false,
+//     content: 
+//       '<div class="list no-hairlines no-hairlines-between">\
+//         <ul>\
+//           <li class="item-content item-input">\
+//             <div class="item-inner">\
+//               <div class="item-input-wrap">\
+//                 <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
+//               </div>\
+//             </div>\
+//           </li>\
+//         </ul>\
+//       </div>',
+//     buttons: [
+//     {
+//       text: 'Batal',
+//       onClick: function(dialog, e){
+//         dialog.close();
+//       }
+//     },{
+//       text: 'Simpan',
+//       onClick: function(dialog, e){
+//         // if(st1 > 0 && st2 > 0){
+//           var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
+//           var saldo = sal.replace(/\D/g,'');
+//           var newsaldo = parseInt(saldo) + parseInt(nominal);
+//           var temp = {
+//             act : "insert",
+//             jenis_print : "setoran",
+//             jenis : jenis,
+//             cif : cif,
+//             rek : rek,
+//             nominal : nominal,
+//             nama : nama,
+//             user : iduser,
+//             saldo : newsaldo,
+//             TOKEN : token
+//           }
   
-          if(nominal + limit <= limit_harian){
-            $.ajax({
-              url: site+"/API/setoran/",
-              method: "POST",
-              data: JSON.stringify(temp),
-              success: function(result){
+//           if(nominal + limit <= limit_harian){
+//             $.ajax({
+//               url: site+"/API/setoran/",
+//               method: "POST",
+//               data: JSON.stringify(temp),
+//               success: function(result){
 
-                console.log(result[0].idx);
-                if(result[0].RESULT == "1"){
-                  app.toast.create({
-                    text: "Setoran Berhasil",
-                    closeTimeout: 3000,
-                    closeButton: true
-                  }).open();
+//                 console.log(result[0].idx);
+//                 if(result[0].RESULT == "1"){
+//                   app.toast.create({
+//                     text: "Setoran Berhasil",
+//                     closeTimeout: 3000,
+//                     closeButton: true
+//                   }).open();
 
-                  dialog.close();
+//                   dialog.close();
 
-                  // previewSetoran(result[0].idx);
-                  printSetoran(result[0].idx);
+//                   // previewSetoran(result[0].idx);
+//                   printSetoran(result[0].idx);
 
-                  app.views.main.router.refreshPage();
-                } else if(result[0].RESULT == "2"){
-                  app.toast.create({
-                    text: "Setoran Gagal",
-                    closeTimeout: 3000,
-                    closeButton: true
-                  }).open();
-                  dialog.close();
-                  app.views.main.router.refreshPage();
-                } else {
-                  app.toast.create({
-                    text: "Unknown Error",
-                    closeTimeout: 3000,
-                    closeButton: true
-                  }).open();
-                  dialog.close();
-                  app.views.main.router.refreshPage();
-                }
-              }
-            })
-          } else {
-            app.toast.create({
-              text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
-              closeTimeout: 3000,
-              closeButton: true
-            }).open();
+//                   app.views.main.router.refreshPage();
+//                 } else if(result[0].RESULT == "2"){
+//                   app.toast.create({
+//                     text: "Setoran Gagal",
+//                     closeTimeout: 3000,
+//                     closeButton: true
+//                   }).open();
+//                   dialog.close();
+//                   app.views.main.router.refreshPage();
+//                 } else {
+//                   app.toast.create({
+//                     text: "Unknown Error",
+//                     closeTimeout: 3000,
+//                     closeButton: true
+//                   }).open();
+//                   dialog.close();
+//                   app.views.main.router.refreshPage();
+//                 }
+//               }
+//             })
+//           } else {
+//             app.toast.create({
+//               text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
+//               closeTimeout: 3000,
+//               closeButton: true
+//             }).open();
+//           }
+//         /* } else {
+//           app.toast.create({
+//             text: "File CSV / Setoran Belum Diupload Di Core, Silahkan Hubungi Admin / Back Office.",
+//             closeTimeout: 3000,
+//             closeButton: true
+//           }).open();
+//         } */
+//       }
+//     }]
+//   }).open();
+// }
+
+function proses(jenis, cif, rek, nama, sal, limit){
+  window.DatecsPrinter.listBluetoothDevices(function(devices){
+    window.DatecsPrinter.connect(devices[0].address, function(){
+      app.dialog.create({
+        title: 'Setoran',
+        closeByBackdropClick: false,
+        content: 
+          '<div class="list no-hairlines no-hairlines-between">\
+            <ul>\
+              <li class="item-content item-input">\
+                <div class="item-inner">\
+                  <div class="item-input-wrap">\
+                    <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
+                  </div>\
+                </div>\
+              </li>\
+            </ul>\
+          </div>',
+        buttons: [
+        {
+          text: 'Batal',
+          onClick: function(dialog, e){
+            dialog.close();
           }
-        /* } else {
-          app.toast.create({
-            text: "File CSV / Setoran Belum Diupload Di Core, Silahkan Hubungi Admin / Back Office.",
-            closeTimeout: 3000,
-            closeButton: true
-          }).open();
-        } */
-      }
-    }]
-  }).open();
+        },{
+          text: 'Simpan',
+          onClick: function(dialog, e){
+            // if(st1 > 0 && st2 > 0){
+              var nominal = parseInt($('#nominal').val().replace(/\D/g, ''));
+              var saldo = sal.replace(/\D/g,'');
+              var newsaldo = parseInt(saldo) + parseInt(nominal);
+              var temp = {
+                act : "insert",
+                jenis_print : "setoran",
+                jenis : jenis,
+                cif : cif,
+                rek : rek,
+                nominal : nominal,
+                nama : nama,
+                user : iduser,
+                saldo : newsaldo,
+                TOKEN : token
+              }
+      
+              if(nominal + limit <= limit_harian){
+                $.ajax({
+                  url: site+"/API/setoran/",
+                  method: "POST",
+                  data: JSON.stringify(temp),
+                  success: function(result){
+    
+                    console.log(result[0].idx);
+                    if(result[0].RESULT == "1"){
+                      // app.toast.create({
+                      //   text: "Setoran Berhasil",
+                      //   closeTimeout: 3000,
+                      //   closeButton: true
+                      // }).open();
+    
+                      dialog.close();
+    
+                      // previewSetoran(result[0].idx);
+                      printSetoran(result[0].idx);
+    
+                      app.views.main.router.refreshPage();
+                    } else if(result[0].RESULT == "2"){
+                      app.toast.create({
+                        text: "Setoran Gagal",
+                        closeTimeout: 3000,
+                        closeButton: true
+                      }).open();
+
+                      window.DatecsPrinter.disconnect();
+
+                      dialog.close();
+                      app.views.main.router.refreshPage();
+                    } else {
+                      app.toast.create({
+                        text: "Unknown Error",
+                        closeTimeout: 3000,
+                        closeButton: true
+                      }).open();
+
+                      window.DatecsPrinter.disconnect();
+
+                      dialog.close();
+                      app.views.main.router.refreshPage();
+                    }
+                  }
+                })
+              } else {
+                app.toast.create({
+                  text: "Setoran Untuk Rekening Tersebut Telah Mencapai Batas Harian. Membatalkan Proses Setoran.",
+                  closeTimeout: 3000,
+                  closeButton: true
+                }).open();
+              }
+            /* } else {
+              app.toast.create({
+                text: "File CSV / Setoran Belum Diupload Di Core, Silahkan Hubungi Admin / Back Office.",
+                closeTimeout: 3000,
+                closeButton: true
+              }).open();
+            } */
+          }
+        }]
+      }).open();
+    }, function(){
+      alert("Gagal tersambung ke printer");
+    })
+  }, function(){
+    alert("Printer tidak ditemukan");
+  })
 }
 
 function printSetoran(idx){
   gagal_print = idx;
   
-  window.DatecsPrinter.listBluetoothDevices(function (devices) {
-    window.DatecsPrinter.connect(devices[0].address, function() {
+  // window.DatecsPrinter.listBluetoothDevices(function (devices) {
+    // window.DatecsPrinter.connect(devices[0].address, function() {
       $.ajax({
         url: site+"/API/setoran/"+idx+"/",
         method: "GET",
@@ -446,12 +561,12 @@ function printSetoran(idx){
           });
         }
       });
-    }, function() {
-      alert("Tidak dapat tersambung ke printer");
-    });
-  }, function(){
-    alert("Tidak ditemukan perangkat printer")
-  })
+    // }, function() {
+    //   alert("Tidak dapat tersambung ke printer");
+    // });
+  // }, function(){
+  //   alert("Tidak ditemukan perangkat printer")
+  // })
 
 //   $.ajax({
 //     url: site+"/API/setoran/"+idx+"/",
