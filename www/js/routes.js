@@ -24,49 +24,49 @@ var routes =
     history: false,
     on: {
       pageAfterIn: function(){
-        ac = app.autocomplete.create({
-          inputEl: '#input_cif',
-          openIn: 'dropdown',
-          preloader: true,
-          limit: 10,
-          source: function(query, render){
-            var autoc = this;
-            var results = [];
-            var temp = {
-              "query" : query
-            }
+        // ac = app.autocomplete.create({
+        //   inputEl: '#input_cif',
+        //   openIn: 'dropdown',
+        //   preloader: true,
+        //   limit: 10,
+        //   source: function(query, render){
+        //     var autoc = this;
+        //     var results = [];
+        //     var temp = {
+        //       "query" : query
+        //     }
 
-            /*if(query.length === 0){
-              render(results);
-              return;
-            }*/
+        //     /*if(query.length === 0){
+        //       render(results);
+        //       return;
+        //     }*/
 
-            if(query.length <= 3){
-              render(results);
-              return;
-            }
+        //     if(query.length <= 3){
+        //       render(results);
+        //       return;
+        //     }
 
-            autoc.preloaderShow();
-            $.ajax({
-              url: site+'/API/cari/',
-              method: 'POST',
-              data: JSON.stringify(temp),
-              success: function(result){
-                for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
-                }
+        //     autoc.preloaderShow();
+        //     $.ajax({
+        //       url: site+'/API/cari/',
+        //       method: 'POST',
+        //       data: JSON.stringify(temp),
+        //       success: function(result){
+        //         for(var i = 0; i < result.length; i++){
+        //           if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+        //         }
 
-                autoc.preloaderHide();
-                render(results);
-              }
-            })
-          },
-          on: {
-            change: function(value){
-              cekCIF('cif', value[0].split(' - ')[0])
-            }
-          }
-        });
+        //         autoc.preloaderHide();
+        //         render(results);
+        //       }
+        //     })
+        //   },
+        //   on: {
+        //     change: function(value){
+        //       cekCIF('cif', value[0].split(' - ')[0])
+        //     }
+        //   }
+        // });
       }
     }
   },
@@ -100,15 +100,26 @@ var routes =
             }
 
             autoc.preloaderShow();
-            $.ajax({
+            if(xhr != null){
+              xhr.abort();
+              xhr = null;
+            }
+
+            xhr = $.ajax({
               url: site+'/API/cari/',
               method: 'POST',
               data: JSON.stringify(temp),
               success: function(result){
-                for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
-                  // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
-                  // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+                console.log("length: " +result.length);
+                if(result.length > 0){
+                  for(var i = 0; i < result.length; i++){
+                    if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                    // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                    // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+                  }
+                } else {
+                  console.log("DATA TIDAK DITEMUKAN!");
+                  results.push("DATA TIDAK DITEMUKAN!");
                 }
 
                 autoc.preloaderHide();
@@ -119,6 +130,7 @@ var routes =
           on: {
             change: function(value){
               console.log(value);
+              xhr.abort();
               cekCIF('coll_s', value[0].split(' - ')[0])
             }
           }
@@ -132,49 +144,49 @@ var routes =
     name: 'coll_angsuran',
     on: {
       pageAfterIn: function(){
-        ac = app.autocomplete.create({
-          inputEl: '#input_colla',
-          openIn: 'dropdown',
-          preloader: true,
-          limit: 10,
-          source: function(query, render){
-            var autoc = this;
-            var results = [];
-            var temp = {
-              "query" : query
-            }
+        // ac = app.autocomplete.create({
+        //   inputEl: '#input_colla',
+        //   openIn: 'dropdown',
+        //   preloader: true,
+        //   limit: 10,
+        //   source: function(query, render){
+        //     var autoc = this;
+        //     var results = [];
+        //     var temp = {
+        //       "query" : query
+        //     }
 
-            /*if(query.length === 0){
-              render(results);
-              return;
-            }*/
+        //     /*if(query.length === 0){
+        //       render(results);
+        //       return;
+        //     }*/
 
-            if(query.length <= 3){
-              render(results);
-              return;
-            }
+        //     if(query.length <= 3){
+        //       render(results);
+        //       return;
+        //     }
 
-            autoc.preloaderShow();
-            $.ajax({
-              url: site+'/API/cari/',
-              method: 'POST',
-              data: JSON.stringify(temp),
-              success: function(result){
-                for(var i = 0; i < result.length; i++){
-                  if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
-                }
+        //     autoc.preloaderShow();
+        //     $.ajax({
+        //       url: site+'/API/cari/',
+        //       method: 'POST',
+        //       data: JSON.stringify(temp),
+        //       success: function(result){
+        //         for(var i = 0; i < result.length; i++){
+        //           if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+        //         }
 
-                autoc.preloaderHide();
-                render(results);
-              }
-            })
-          },
-          on: {
-            change: function(value){
-              cekCIF('coll_a', value[0].split(' - ')[0])
-            }
-          }
-        });
+        //         autoc.preloaderHide();
+        //         render(results);
+        //       }
+        //     })
+        //   },
+        //   on: {
+        //     change: function(value){
+        //       cekCIF('coll_a', value[0].split(' - ')[0])
+        //     }
+        //   }
+        // });
       }
     }
   },
@@ -475,5 +487,101 @@ var routes =
         })
       }
     }
-  }
+  },
+  {
+    path: '/history_trans/',
+    componentUrl: './pages/history.html',
+    name: 'histrans',
+    on: {
+      pageAfterIn: function(){
+        ac = app.autocomplete.create({
+          inputEl: '#input_history',
+          openIn: 'dropdown',
+          preloader: true,
+          expandInput: true,
+          limit: 10,
+          source: function(query, render){
+            var autoc = this;
+            var results = [];
+            var temp = {
+              "query" : query
+            }
+
+            /*if(query.length === 0){
+              render(results);
+              return;
+            }*/
+
+            if(query.length <= 3){
+              render(results);
+              return;
+            }
+
+            autoc.preloaderShow();
+            if(xhr != null){
+              xhr.abort();
+              xhr = null;
+            }
+
+            xhr = $.ajax({
+              url: site+'/API/cari/',
+              method: 'POST',
+              data: JSON.stringify(temp),
+              success: function(result){
+                console.log("length: " +result.length);
+                if(result.length > 0){
+                  for(var i = 0; i < result.length; i++){
+                    if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                    // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                    // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
+                  }
+                } else {
+                  console.log("DATA TIDAK DITEMUKAN!");
+                  results.push("DATA TIDAK DITEMUKAN!");
+                }
+
+                autoc.preloaderHide();
+                render(results);
+              }
+            })
+          },
+          on: {
+            change: function(value){
+              console.log(value);
+              xhr.abort();
+
+              var result = value[0].split(' - ');
+              var tabel = 
+              '<table style="width: 100%; padding-left: 16px;">\
+                  <tr>\
+                    <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
+                  </tr>\
+                  <tr>\
+                    <td width="15%"><b>CIF</b></td>\
+                    <td width="5%"><b>:</b></td>\
+                    <td width="80%"><b>'+result[0]+'</b></td>\
+                  </tr>\
+                  <tr>\
+                    <td width="15%"><b>Nama</b></td>\
+                    <td width="5%"><b>:</b></td>\
+                    <td width="80%"><b>'+result[1]+'</b></td>\
+                  </tr>\
+                  <tr>\
+                    <td width="15%"><b>Alamat</b></td>\
+                    <td width="5%"><b>:</b></td>\
+                    <td width="80%"><b>'+result[2]+'</b></td>\
+                  </tr>\
+                </table>\
+              ';
+
+              $('#detil_history').html(tabel);
+
+              // cekHist(value[0].split(' - ')[0], 0);
+              cekHist(result[0], 0);
+            }
+          }
+        });
+      }
+    }
+  },
 ];

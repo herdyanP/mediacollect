@@ -1,0 +1,46 @@
+<template>
+	<div class="page" data-name="histrans">
+		<div class="navbar">
+			<div class="navbar-inner">
+				<div class="left">
+					<a href="#" class="link icon-only panel-open" data-panel="left">
+		                <i class="f7-icons md-only">menu</i>
+		                <span class="ios-only">Menu</span>
+		              </a>
+				</div>
+				<div class="title">History Transaksi</div>
+				<!-- <div class="right">
+					<a href="#" class="link icon-only" onclick="printUlangSetoran();">
+						<i class="material-icons">print</i>
+					</a>
+				</div> -->
+			</div>
+		</div>
+
+		<!-- <div class="fab fab-extended fab-center-bottom">
+			<a href="#">
+			    <div class="fab-text">Proses</div>
+			</a>
+		</div> -->
+
+		<div class="page-content">
+			<div class="block">
+				<div class="list no-hairlines no-hairlines-between">
+					<ul>
+						<li class="item-content item-input">
+							<div class="item-inner">
+								<div class="item-title item-label" style="color: unset;">CIF / Nama / Alamat Nasabah</div>
+								<div class="item-input-wrap">
+									<!-- <input type="text" id="" name="" onkeyup="cekCIF('coll_s', event, this.value);"> -->
+									<input type="text" id="input_history" name="input_history" onclick="this.select();">
+								</div>
+							</div>
+		                </li>
+					</ul>
+				</div>
+			</div>
+			<div class="block" id="detil_history"></div>
+			<div class="block" id="rekening_history"></div>
+		</div>
+	</div>
+</template>

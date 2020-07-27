@@ -2,6 +2,9 @@
 // sudo cordova build android --release -- --keystore=mcoll.keystore --storePassword=bismillah --alias=mcoll --password=bismillah
 // C:\Program Files\Java\jre1.8.0_221\bin>keytool -genkey -v -keystore mcoll.keystore -alias mcoll -keyalg RSA -keysize 2048 -validity 10000
 
+// keytool -genkey -v -keystore [insert nama].keystore -alias [insert alias] -keyalg RSA -keysize 2048 -validity 10000
+// cordova build android --release -- --keystore=[insert nama].keystore --storePassword=[insert password pas bikin keystore] --alias=[insert alias] --password=[insert password pas bikin keystore]
+
 // Init App
 var app = new Framework7({
   id: 'com.medianusamandiri.collectionapp',
@@ -32,8 +35,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-var site = 'http://mcollection.cloudmnm.com';
-// var site = 'http://mcollection.cloudmnm.com/dev';
+// var site = 'http://mcollection.cloudmnm.com';
+var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -47,12 +50,14 @@ var timeout_dur = 0;
 var logout_timer = '';
 var session_token = '';
 var session_checker = '';
+var session_timeout = '';
 var limit_harian = 0;
 var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 var listCabang = [];
 var gagal_print = '';
 var st1 = 0, st2 = 0;
 var token = '';
+var xhr = null;
 
 function onNewLogin(form){
   var temp = {};
@@ -73,6 +78,7 @@ function onNewLogin(form){
         if(result[0].RESULT == 1){
           iduser = result[0].USERNAME;
           timeout_dur = result[0].timeout;
+          session_timeout = result[0].session;
           session_token = result[0].token;
           listCabang = result[0].cabang;
           idrole = result[0].ID_ROLE;
@@ -90,6 +96,7 @@ function onNewLogin(form){
             $('#divider_utama').css('display', 'block');
             $('#menu_collection').css('display', 'block');
             $('#menu_posting').css('display', 'block');
+            $('#menu_history').css('display', 'block');
             app.views.main.router.navigate('/coll_simpanan/');
           } else {
             jenis_laporan = 'saving';
@@ -223,57 +230,60 @@ function cekCIF(src, cif){
         ';
 
         switch(src){
-          case "cif":
-            dt1 = '<table>\
-                <thead>\
-                  <tr>\
-                    <th class="label-cell">Rekening</th>\
-                    <th >Produk</th>\
-                    <th class="numeric-cell">Saldo</th>\
-                  </tr>\
-                </thead>\
-                <tbody>\
-            ';
+          // case "cif":
+          //   dt1 = '<table>\
+          //       <thead>\
+          //         <tr>\
+          //           <th class="label-cell">Rekening</th>\
+          //           <th >Produk</th>\
+          //           <th class="numeric-cell">Saldo</th>\
+          //         </tr>\
+          //       </thead>\
+          //       <tbody>\
+          //   ';
 
-            for(var i = 0; i < result.length; i++){
-              dt1 += '<tr>\
-                        <td class="label-cell">'+result[i].SSREK+'</td>\
-                        <td >'+result[i].jpinjaman+'</td>\
-                        <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
-                      </tr>\
-              ';
-            }
+          //   for(var i = 0; i < result.length; i++){
+          //     dt1 += '<tr>\
+          //               <td class="label-cell">'+result[i].SSREK+'</td>\
+          //               <td >'+result[i].jpinjaman+'</td>\
+          //               <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
+          //             </tr>\
+          //     ';
+          //   }
 
-            dt1 += '</tbody>\
-                  </table>\
-              ';
+          //   dt1 += '</tbody>\
+          //         </table>\
+          //     ';
 
-            $('#rekening_cif').html(dt1);
-            $('#detil_cif').html(tabel);
-            break;
+          //   $('#rekening_cif').html(dt1);
+          //   $('#detil_cif').html(tabel);
+          //   break;
 
           case "coll_s":
-            dt1 = '<table>\
+            dt1 = '<table style="width: 100%">\
                 <thead>\
-                    <th class="label-cell"><b>Rekening</b></th>\
-                    <th><b>Produk</b></th>\
-                    <th class="numeric-cell"><b>Saldo</b></th>\
-                    <th><b>Update Terakhir</b></th>\
-                    <th><b>Status</th>\
-                    <th></th>\
+                    <th style="width: 20%;" class="label-cell"><b>Rekening</b></th>\
+                    <th style="width: 30%;"><b>Nama Produk</b></th>\
+                    <th style="width: 20%;" class="numeric-cell"><b>Saldo Sekarang</b></th>\
+                    <th style="width: 10%;"><b>Update Terakhir</b></th>\
+                    <th style="width: 10%;"><b>Status</th>\
+                    <th style="width: 10%;"></th>\
                   </tr>\
                 </thead>\
                 <tbody>\
             ';
 
+            var back1 = "#e6ecf2";
+            var back2 = "#ffffff";
+
             for(var i = 0; i < result.length; i++){
-              dt1 += '<tr>\
-                        <td class="label-cell"><b>'+result[i].SSREK+'</b></td>\
-                        <td><b>'+result[i].jpinjaman+'</b></td>\
-                        <td class="numeric-cell"><b>'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</b></th>\
-                        <td><b>'+result[i].SSTGL+'</b></td>\
-                        <td><b>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</b></td>\
-                        <td ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\', '+result[i].LIMIT+')">Proses</a></td>\
+              dt1 += '<tr style="background: ' +(i % 2 == 0? back1 : back2)+ '; border-left: solid black 2px; border-right: solid black 2px;">\
+                        <td style="width: 20%;" class="label-cell"><b>'+result[i].SSREK+'</b></td>\
+                        <td style="width: 30%;"><b>'+result[i].jpinjaman+'</b></td>\
+                        <td style="width: 20%;" class="numeric-cell"><b>'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</b></th>\
+                        <td style="width: 10%;"><b>'+result[i].SSTGL+'</b></td>\
+                        <td style="width: 10%;"><b>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</b></td>\
+                        <td style="width: 10%;" ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\', '+result[i].LIMIT+')">Proses</a></td>\
                       </tr>\
               ';
             }
@@ -286,12 +296,101 @@ function cekCIF(src, cif){
             $('#detil_colls').html(tabel);
             break;
 
-          case "coll_a":
-            $('#detil_colla').html(tabel);
-            break;
+          // case "coll_a":
+          //   $('#detil_colla').html(tabel);
+          //   break;
         }
       }
     });
+  }
+}
+
+function cekHist(cif, start){
+  var temp = {
+    "cif": cif,
+    "start": start
+  };
+
+  // var tabel = '';
+  var dt1 = '';
+  if(cif != ''){
+    $.ajax({
+      url: site+'/API/history/',
+      method: 'POST',
+      data: JSON.stringify(temp),
+      success: function(result){
+        // tabel = '<table style="width: 100%; padding-left: 16px;">\
+        //     <tr>\
+        //       <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
+        //     </tr>\
+        //     <tr>\
+        //       <td width="15%"><b>CIF</b></td>\
+        //       <td width="5%"><b>:</b></td>\
+        //       <td width="80%"><b>'+result[0].CIF+'</b></td>\
+        //     </tr>\
+        //     <tr>\
+        //       <td width="15%"><b>Nama</b></td>\
+        //       <td width="5%"><b>:</b></td>\
+        //       <td width="80%"><b>'+result[0].SSNAMA+'</b></td>\
+        //     </tr>\
+        //     <tr>\
+        //       <td width="15%"><b>Alamat</b></td>\
+        //       <td width="5%"><b>:</b></td>\
+        //       <td width="80%"><b>'+result[0].SSALAMAT+'</b></td>\
+        //     </tr>\
+        //   </table>\
+        // ';
+
+        dt1 = '<div class="data-table" >\
+              <table>\
+                <thead>\
+                    <th class="label-cell"><b>No. </b></th>\
+                    <th><b>Nomor Struk</b></th>\
+                    <th><b>Tanggal Transaksi</b></th>\
+                    <th><b>Nomor Rekening</b></th>\
+                    <th class="numeric-cell"><b>Jumlah Setoran</b></th>\
+                    <th><b>Petugas</b></th>\
+                  </tr>\
+                </thead>\
+                <tbody>\
+            ';
+
+            var back1 = "#e6ecf2";
+            var back2 = "#ffffff";
+            var no = start;
+
+            for(var i = 0; i < result.length; i++){
+              no++;
+              dt1 += '<tr style="background: ' +(i % 2 == 0? back1 : back2)+ '; border-left: solid black 2px; border-right: solid black 2px;">\
+                        <td class="label-cell"><b>'+no+'</b></td>\
+                        <td><b>'+result[i].NO_TRANSAKSI+'</b></td>\
+                        <td><b>'+result[i].TANGGAL+'</b></td>\
+                        <td><b>'+result[i].ID_SIMPANAN+'</b></td>\
+                        <td class="numeric-cell"><b>'+parseInt(result[i].NOMINAL).toLocaleString('id-ID')+'</b></th>\
+                        <td><b>'+result[i].ID_USER+'</b></td>\
+                      </tr>\
+              ';
+            }
+
+            dt1 += '</tbody>\
+                  </table>\
+                  </div>\
+                  <div class="data-table-footer">\
+                    <div class="data-table-pagination">\
+                      <a href="#" onclick="cekHist(\''+cif+'\', '+(start-10)+')" class="link ' +(start == 0 ? 'disabled' : '')+ '">\
+                        <i class="icon icon-prev color-gray"></i>\
+                      </a>\
+                      <a href="#" onclick="cekHist(\''+cif+'\', '+(start+10)+')" class="link ' +(result.length < 10 ? 'disabled' : '')+ '">\
+                        <i class="icon icon-next color-gray"></i>\
+                      </a>\
+                    </div>\
+                  </div>\
+              ';
+
+            $('#rekening_history').html(dt1);
+            // $('#detil_history').html(tabel);
+      }
+    })
   }
 }
 
@@ -399,6 +498,7 @@ function cekCIF(src, cif){
 function proses(jenis, cif, rek, nama, sal, limit){
   window.DatecsPrinter.listBluetoothDevices(function(devices){
     window.DatecsPrinter.connect(devices[0].address, function(){
+
       app.dialog.create({
         title: 'Setoran',
         closeByBackdropClick: false,
@@ -441,12 +541,15 @@ function proses(jenis, cif, rek, nama, sal, limit){
               }
       
               if(nominal + limit <= limit_harian){
+                var prel = app.dialog.preloader('Menyimpan setoran ke server...');
+
                 $.ajax({
                   url: site+"/API/setoran/",
                   method: "POST",
                   data: JSON.stringify(temp),
                   success: function(result){
-    
+                    prel.close();
+
                     console.log(result[0].idx);
                     if(result[0].RESULT == "1"){
                       // app.toast.create({
@@ -456,28 +559,32 @@ function proses(jenis, cif, rek, nama, sal, limit){
                       // }).open();
     
                       dialog.close();
+                      app.dialog.alert("Berhasil tersimpan", "Sukses", function(){
+                        // previewSetoran(result[0].idx);
+                        printSetoran(result[0].idx);
+                      });
     
-                      // previewSetoran(result[0].idx);
-                      printSetoran(result[0].idx);
     
-                      app.views.main.router.refreshPage();
+                      // app.views.main.router.refreshPage();
                     } else if(result[0].RESULT == "2"){
-                      app.toast.create({
-                        text: "Setoran Gagal",
-                        closeTimeout: 3000,
-                        closeButton: true
-                      }).open();
+                      // app.toast.create({
+                      //   text: "Setoran Gagal",
+                      //   closeTimeout: 3000,
+                      //   closeButton: true
+                      // }).open();
+                      app.dialog.alert("Gagal tersimpan", "Error");
 
                       window.DatecsPrinter.disconnect();
 
                       dialog.close();
                       app.views.main.router.refreshPage();
                     } else {
-                      app.toast.create({
-                        text: "Unknown Error",
-                        closeTimeout: 3000,
-                        closeButton: true
-                      }).open();
+                      // app.toast.create({
+                      //   text: "Unknown Error",
+                      //   closeTimeout: 3000,
+                      //   closeButton: true
+                      // }).open();
+                      app.dialog.alert("Gagal tersimpan", "Error");
 
                       window.DatecsPrinter.disconnect();
 
@@ -492,6 +599,8 @@ function proses(jenis, cif, rek, nama, sal, limit){
                   closeTimeout: 3000,
                   closeButton: true
                 }).open();
+
+                window.DatecsPrinter.disconnect();
               }
             /* } else {
               app.toast.create({
@@ -503,6 +612,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
           }
         }]
       }).open();
+      
     }, function(){
       alert("Gagal tersambung ke printer");
     })
@@ -514,6 +624,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
 function printSetoran(idx){
   gagal_print = idx;
   
+  var prel = app.dialog.preloader('Mencetak Struk...');
   // window.DatecsPrinter.listBluetoothDevices(function (devices) {
     // window.DatecsPrinter.connect(devices[0].address, function() {
       $.ajax({
@@ -550,14 +661,18 @@ function printSetoran(idx){
           // console.log(cetakan);
 
           window.DatecsPrinter.printText(cetakan, 'ISO-8859-1', function(){
-            app.toast.create({
-              text: "Setoran Berhasil",
-              closeTimeout: 3000,
-              closeButton: true
-            }).open();
+            prel.close();
+            app.dialog.alert("Berhasil Mencetak", "Sukses");
+            // app.toast.create({
+            //   text: "Setoran Berhasil",
+            //   closeTimeout: 3000,
+            //   closeButton: true
+            // }).open();
             app.views.main.router.refreshPage();
           }, function() {
-            alert("Gagal mencetak");
+            prel.close();
+            app.dialog.alert("Gagal mencetak", "Error");
+            app.views.main.router.refreshPage();
           });
         }
       });
@@ -1111,13 +1226,14 @@ function laporanReport(){
                             </thead>\
                             <tbody>\
             ';*/
-            var datanya = '<table>\
+            var datanya = '<table style="table-layout: fixed">\
                             <thead>\
                               <tr>\
                                 <th style="width: 5%;">No</th>\
                                 <th style="width: 30%;">Nama Nasabah</th>\
                                 <th style="width: 25%;">Nominal</th>\
                                 <th style="width: 10%;">CIF</th>\
+                                <th style="width: 10%;">Rekening</th>\
                                 <th style="width: 25%;">Tanggal</th>\
                                 <th style="width: 5%;">User</th>\
                               </tr>\
@@ -1130,6 +1246,7 @@ function laporanReport(){
                           <td style="text-align: center; padding: 10px 0;">'+ result[i].NAMA +'</td>\
                           <td style="text-align: right; padding: 10px 10px 10px 0;">'+ parseInt(result[i].NOMINAL).toLocaleString('id-ID') +'</td>\
                           <td style="text-align: center; padding: 10px 0;">'+ result[i].CIF +'</td>\
+                          <td style="text-align: center; padding: 10px 0;">'+ result[i].ID_SIMPANAN +'</td>\
                           <td style="text-align: center; padding: 10px 0;">'+ result[i].TANGGAL.split(' ')[0] +'</td>\
                           <td style="text-align: center; padding: 10px 0;">'+ result[i].USER +'</td>\
             ';
@@ -1381,7 +1498,8 @@ function cekSession(){
         // console.log(result[0].token);
         if(result[0].token == session_token){
           console.log("token matched");
-          session_checker = setTimeout(cekSession, 3 * 1000);
+          // session_checker = setTimeout(cekSession, 3 * 1000);
+          session_checker = setTimeout(cekSession, session_timeout * 1000);
         } else {
           console.log("token mismatched");
           onLogout(2);
