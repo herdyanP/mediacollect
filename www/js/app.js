@@ -35,8 +35,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-var site = 'http://mcollection.cloudmnm.com';
-// var site = 'http://mcollection.cloudmnm.com/dev';
+// var site = 'http://mcollection.cloudmnm.com';
+var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
