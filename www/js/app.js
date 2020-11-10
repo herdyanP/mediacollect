@@ -35,8 +35,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-// var site = 'http://mcollection.cloudmnm.com';
-var site = 'http://mcollection.cloudmnm.com/dev';
+var site = 'http://mcollection.cloudmnm.com';
+// var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -196,112 +196,6 @@ function onLogout(t){
       alert("Aplikasi terbaru ditemukan");
       window.open(result[0].LINK, "_blank");
       break;
-  }
-}
-
-function cekCIF(src, cif){
-  var tabel = '';
-  var dt1 = '';
-  if(cif != ''){
-    $.ajax({
-      url: site+'/API/CIF/'+cif+'/',
-      method: 'GET',
-      success: function(result){
-        tabel = '<table style="width: 100%; padding-left: 16px;">\
-            <tr>\
-              <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
-            </tr>\
-            <tr>\
-              <td width="15%"><b>CIF</b></td>\
-              <td width="5%"><b>:</b></td>\
-              <td width="80%"><b>'+result[0].CIF+'</b></td>\
-            </tr>\
-            <tr>\
-              <td width="15%"><b>Nama</b></td>\
-              <td width="5%"><b>:</b></td>\
-              <td width="80%"><b>'+result[0].SSNAMA+'</b></td>\
-            </tr>\
-            <tr>\
-              <td width="15%"><b>Alamat</b></td>\
-              <td width="5%"><b>:</b></td>\
-              <td width="80%"><b>'+result[0].SSALAMAT+'</b></td>\
-            </tr>\
-          </table>\
-        ';
-
-        switch(src){
-          // case "cif":
-          //   dt1 = '<table>\
-          //       <thead>\
-          //         <tr>\
-          //           <th class="label-cell">Rekening</th>\
-          //           <th >Produk</th>\
-          //           <th class="numeric-cell">Saldo</th>\
-          //         </tr>\
-          //       </thead>\
-          //       <tbody>\
-          //   ';
-
-          //   for(var i = 0; i < result.length; i++){
-          //     dt1 += '<tr>\
-          //               <td class="label-cell">'+result[i].SSREK+'</td>\
-          //               <td >'+result[i].jpinjaman+'</td>\
-          //               <td class="numeric-cell">'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</th>\
-          //             </tr>\
-          //     ';
-          //   }
-
-          //   dt1 += '</tbody>\
-          //         </table>\
-          //     ';
-
-          //   $('#rekening_cif').html(dt1);
-          //   $('#detil_cif').html(tabel);
-          //   break;
-
-          case "coll_s":
-            dt1 = '<table style="width: 100%">\
-                <thead>\
-                    <th style="width: 20%;" class="label-cell"><b>Rekening</b></th>\
-                    <th style="width: 30%;"><b>Nama Produk</b></th>\
-                    <th style="width: 20%;" class="numeric-cell"><b>Saldo Sekarang</b></th>\
-                    <th style="width: 10%;"><b>Update Terakhir</b></th>\
-                    <th style="width: 10%;"><b>Status</th>\
-                    <th style="width: 10%;"></th>\
-                  </tr>\
-                </thead>\
-                <tbody>\
-            ';
-
-            var back1 = "#e6ecf2";
-            var back2 = "#ffffff";
-
-            for(var i = 0; i < result.length; i++){
-              dt1 += '<tr style="background: ' +(i % 2 == 0? back1 : back2)+ '; border-left: solid black 2px; border-right: solid black 2px;">\
-                        <td style="width: 20%;" class="label-cell"><b>'+result[i].SSREK+'</b></td>\
-                        <td style="width: 30%;"><b>'+result[i].jpinjaman+'</b></td>\
-                        <td style="width: 20%;" class="numeric-cell"><b>'+parseInt(result[i].saldo).toLocaleString('id-ID')+'</b></th>\
-                        <td style="width: 10%;"><b>'+result[i].SSTGL+'</b></td>\
-                        <td style="width: 10%;"><b>'+(result[i].STATUS == 'A' ? 'Aktif' : 'Pasif')+'</b></td>\
-                        <td style="width: 10%;" ><a onclick="proses(\'simpanan\', \''+result[i].CIF+'\', \''+result[i].SSREK+'\', \''+result[i].SSNAMA+'\', \''+result[i].saldo+'\', '+result[i].LIMIT+')">Proses</a></td>\
-                      </tr>\
-              ';
-            }
-
-            dt1 += '</tbody>\
-                  </table>\
-              ';
-
-            $('#rekening_colls').html(dt1);
-            $('#detil_colls').html(tabel);
-            break;
-
-          // case "coll_a":
-          //   $('#detil_colla').html(tabel);
-          //   break;
-        }
-      }
-    });
   }
 }
 
