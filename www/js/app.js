@@ -35,8 +35,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-var site = 'http://mcollection.cloudmnm.com';
-// var site = 'http://mcollection.cloudmnm.com/dev';
+// var site = 'http://mcollection.cloudmnm.com';
+var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';
 var tot_simpanan = 0;
@@ -213,28 +213,6 @@ function cekHist(cif, start){
       method: 'POST',
       data: JSON.stringify(temp),
       success: function(result){
-        // tabel = '<table style="width: 100%; padding-left: 16px;">\
-        //     <tr>\
-        //       <td colspan="3" style="text-align: left;"><b>Informasi Nasabah</b></td>\
-        //     </tr>\
-        //     <tr>\
-        //       <td width="15%"><b>CIF</b></td>\
-        //       <td width="5%"><b>:</b></td>\
-        //       <td width="80%"><b>'+result[0].CIF+'</b></td>\
-        //     </tr>\
-        //     <tr>\
-        //       <td width="15%"><b>Nama</b></td>\
-        //       <td width="5%"><b>:</b></td>\
-        //       <td width="80%"><b>'+result[0].SSNAMA+'</b></td>\
-        //     </tr>\
-        //     <tr>\
-        //       <td width="15%"><b>Alamat</b></td>\
-        //       <td width="5%"><b>:</b></td>\
-        //       <td width="80%"><b>'+result[0].SSALAMAT+'</b></td>\
-        //     </tr>\
-        //   </table>\
-        // ';
-
         dt1 = '<div class="data-table" >\
               <table>\
                 <thead>\
@@ -244,6 +222,7 @@ function cekHist(cif, start){
                     <th><b>Nomor Rekening</b></th>\
                     <th class="numeric-cell"><b>Jumlah Setoran</b></th>\
                     <th><b>Petugas</b></th>\
+                    <th><b>Status Setoran</b></th>\
                   </tr>\
                 </thead>\
                 <tbody>\
@@ -262,6 +241,7 @@ function cekHist(cif, start){
                         <td><b>'+result[i].ID_SIMPANAN+'</b></td>\
                         <td class="numeric-cell"><b>'+parseInt(result[i].NOMINAL).toLocaleString('id-ID')+'</b></th>\
                         <td><b>'+result[i].ID_USER+'</b></td>\
+                        <td><b>'+result[i].status_setoran+'</b></td>\
                       </tr>\
               ';
             }

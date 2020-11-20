@@ -117,7 +117,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
                         <li class="item-content item-input">\
                             <div class="item-inner">\
                                 <div class="item-input-wrap">\
-                                    <input type="tel" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
+                                    <input type="number" inputmode="numeric" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
                                 </div>\
                             </div>\
                         </li>\
@@ -149,40 +149,48 @@ function proses(jenis, cif, rek, nama, sal, limit){
                         }
                         
                         if(nominal + limit <= limit_harian){
-                            var prel = app.dialog.preloader('Menyimpan setoran ke server...');
+                            app.dialog.prompt("*bila tidak ada bisa dikosongkan", "Input Narasi", function(value){
+                                temp.narasi = value;
+                                console.log(temp);
+
+                                var prel = app.dialog.preloader('Menyimpan setoran ke server...');
                             
-                            $.ajax({
-                                url: site+"/API/setoran/",
-                                method: "POST",
-                                data: JSON.stringify(temp),
-                                success: function(result){
-                                    prel.close();
-                                    
-                                    console.log(result[0].idx);
-                                    if(result[0].RESULT == "1"){
+                                $.ajax({
+                                    url: site+"/API/setoran/",
+                                    method: "POST",
+                                    data: JSON.stringify(temp),
+                                    success: function(result){
+                                        prel.close();
                                         
-                                        dialog.close();
-                                        app.dialog.alert("Berhasil tersimpan", "Sukses", function(){
-                                            printSetoran(result[0].idx);
-                                        });
-                                        
-                                        
-                                    } else if(result[0].RESULT == "2"){
-                                        app.dialog.alert("Gagal tersimpan", "Error");
-                                        
-                                        window.DatecsPrinter.disconnect();
-                                        
-                                        dialog.close();
-                                        app.views.main.router.refreshPage();
-                                    } else {
-                                        app.dialog.alert("Gagal tersimpan", "Error");
-                                        
-                                        window.DatecsPrinter.disconnect();
-                                        
-                                        dialog.close();
-                                        app.views.main.router.refreshPage();
+                                        console.log(result[0].idx);
+                                        if(result[0].RESULT == "1"){
+                                            
+                                            dialog.close();
+                                            app.dialog.alert("Berhasil tersimpan", "Sukses", function(){
+                                                printSetoran(result[0].idx);
+                                            });
+                                            
+                                            
+                                        } else if(result[0].RESULT == "2"){
+                                            app.dialog.alert("Gagal tersimpan", "Error");
+                                            
+                                            window.DatecsPrinter.disconnect();
+                                            
+                                            dialog.close();
+                                            app.views.main.router.refreshPage();
+                                        } else {
+                                            app.dialog.alert("Gagal tersimpan", "Error");
+                                            
+                                            window.DatecsPrinter.disconnect();
+                                            
+                                            dialog.close();
+                                            app.views.main.router.refreshPage();
+                                        }
                                     }
-                                }
+                                })
+
+                            }, function(){
+                                alert('input narasi gagal');
                             })
                         } else {
                             app.toast.create({
@@ -235,7 +243,7 @@ function printSetoran(idx){
             var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
             
             // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
-            var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}JENIS    : " + result.JPINJAMAN + "{br}AMOUNT   : " + parseInt(result.NOMINAL).toLocaleString("id-ID") + "{br}SALDO    : " + parseInt(result.saldo_baru).toLocaleString("id-ID") + "{br}";
+            var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}JENIS    : " + result.JPINJAMAN + "{br}AMOUNT   : " + parseInt(result.NOMINAL).toLocaleString("id-ID") + "{br}SALDO    : " + parseInt(result.saldo_baru).toLocaleString("id-ID") + "{br}NARASI   : " + result.NARASI + "{br}";
             var thanks = "{center}- Terima Kasih -{br}";
             var eol = "{br}{br}{br}";
             
@@ -285,7 +293,7 @@ function printUlangSetoran(){
                 var detil = "{left}NAMA : " + result.SSNAMA + "{br}OPR  : " + iduser + "{br}";
                 
                 // var setor = "{left}SETOR TUNAI{br}TANGGAL  : " + timestamp + "{br}NO TRANS : " + temp.trans + "{br}REK      : " + temp.rek + "{br}AMOUNT   : " + temp.nominal.toLocaleString("id-ID") + "{br}SALDO    : " + temp.saldo.toLocaleString("id-ID") + "{br}";
-                var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}JENIS    : " + result.JPINJAMAN + "{br}AMOUNT   : " + parseInt(result.NOMINAL).toLocaleString("id-ID") + "{br}SALDO    : " + parseInt(result.saldo_baru).toLocaleString("id-ID") + "{br}";
+                var setor = "{left}SETOR TUNAI{br}HARI/TGL : " + datestamp + "{br}JAM      : " + timestamp + "{br}NO TRANS : " + result.NO_TRANSAKSI + "{br}REK      : " + result.ID_SIMPANAN + "{br}JENIS    : " + result.JPINJAMAN + "{br}AMOUNT   : " + parseInt(result.NOMINAL).toLocaleString("id-ID") + "{br}SALDO    : " + parseInt(result.saldo_baru).toLocaleString("id-ID") + "{br}NARASI   : " + result.NARASI + "{br}";
                 var thanks = "{center}- Terima Kasih -{br}";
                 var eol = "{br}{br}{br}";
                 

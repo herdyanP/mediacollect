@@ -270,6 +270,8 @@ var routes =
                           <th class="label-cell">No Transaksi</th>\
                           <th >CIF</th>\
                           <th class="numeric-cell">Nominal</th>\
+                          <th >NOREK</th>\
+                          <th >Nama Nasabah</th>\
                         </tr>\
                       </thead>\
                       <tbody>\
@@ -296,12 +298,14 @@ var routes =
               idx.push(result[i].IDX);
 
               tot_simpanan += parseInt(result[i].NOMINAL);
-              simpanan += '<tr>\
-                        <td class="label-cell">'+result[i].NO_TRANSAKSI+'</td>\
-                        <td >'+result[i].NO_ANGGOTA+'</td>\
-                        <td class="numeric-cell">'+parseInt(result[i].NOMINAL).toLocaleString('id-ID')+'</th>\
-                      </tr>\
-              ';
+              simpanan += 
+              '<tr>\
+                <td class="label-cell">'+result[i].NO_TRANSAKSI+'</td>\
+                <td >'+result[i].NO_ANGGOTA+'</td>\
+                <td class="numeric-cell">'+parseInt(result[i].NOMINAL).toLocaleString('id-ID')+'</td>\
+                <td >'+result[i].ID_SIMPANAN+'</td>\
+                <td >'+result[i].SSNAMA+'</td>\
+              </tr>';
             }
 
             simpanan += "</tbody></table>";
