@@ -117,7 +117,7 @@ function proses(jenis, cif, rek, nama, sal, limit){
                         <li class="item-content item-input">\
                             <div class="item-inner">\
                                 <div class="item-input-wrap">\
-                                    <input type="number" inputmode="numeric" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
+                                    <input type="text" inputmode="numeric" pattern="[0-9]" name="nominal" id="nominal" oninput="comma(this)" style="text-align: right; font-size: 24px;" autocomplete="off"/>\
                                 </div>\
                             </div>\
                         </li>\
