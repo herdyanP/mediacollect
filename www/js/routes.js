@@ -227,6 +227,14 @@ var routes =
                     </div>\
                   </div>\
                 </li>\
+                <li class="item-content item-input inline-label">\
+                  <div class="item-inner">\
+                    <div class="item-title item-label">Pasar</div>\
+                    <div class="item-input-wrap input-dropdown-wrap">\
+                      <select id="pasar"></select>\
+                    </div>\
+                  </div>\
+                </li>\
               </ul>\
             </div>\
             <div class="data-table card">\
@@ -282,6 +290,11 @@ var routes =
         $('#cabang').empty();
         for(var i = 0; i < listCabang.length; i++){
           $('#cabang').append('<option value="'+listCabang[i].id_cab+'">'+listCabang[i].cabang+'</option>');
+        }
+
+        $('#pasar').empty();
+        for(var i = 0; i < listPasar.length; i++){
+          $('#pasar').append('<option value="'+listPasar[i].id_pasar+'">'+listPasar[i].nama_pasar+'</option>');
         }
 
         $.ajax({

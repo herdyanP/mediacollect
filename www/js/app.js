@@ -54,6 +54,7 @@ var session_timeout = '';
 var limit_harian = 0;
 var hari = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
 var listCabang = [];
+var listPasar = [];
 var gagal_print = '';
 var st1 = 0, st2 = 0;
 var token = '';
@@ -97,6 +98,8 @@ function onNewLogin(form){
             $('#menu_collection').css('display', 'block');
             $('#menu_posting').css('display', 'block');
             $('#menu_history').css('display', 'block');
+
+            ambilPasar();
             app.views.main.router.navigate('/coll_simpanan/');
           } else {
             jenis_laporan = 'saving';
@@ -968,6 +971,25 @@ function previewPosting(token){
 
       cetakan = head_unik + kop + separator + post + separator + jeni + jeni_detil + separator_unik + thanks + eol;
       console.log(cetakan);
+    }
+  })
+}
+
+function ambilPasar(){
+  $.ajax({
+    url: site+"/API/pasar/",
+    method: "GET",
+    success: function(result){
+      if(result.ST_CODE == 1){
+        // var isinya = '';
+        // var data = result.DATA;
+        // for(var i = 0; i < data.length; i++){
+        //   isinya += '<option value="'+data[i].id_pasar+'">'+data[i].nama_pasar+'</option>';
+        // }
+
+        // $('#pasar').html(isinya);
+        listPasar = result.DATA;
+      }
     }
   })
 }
