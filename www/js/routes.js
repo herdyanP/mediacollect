@@ -114,7 +114,7 @@ var routes =
                 if(result.length > 0){
                   for(var i = 0; i < result.length; i++){
                     // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
-                    if(result[i].SSREK.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].SSREK+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
+                    if(result[i].SSREK.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0 || result[i].SSALAMAT.indexOf(query.toUpperCase()) >= 0) results.push(result[i].SSREK+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT+' - '+result[i].CIF);
                     // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA+' - '+result[i].SSALAMAT);
                     // if(result[i].CIF.indexOf(query) >= 0 || result[i].SSNAMA.indexOf(query.toUpperCase()) >= 0) results.push(result[i].CIF+' - '+result[i].SSNAMA);
                   }
@@ -132,8 +132,8 @@ var routes =
             change: function(value){
               console.log(value);
               xhr.abort();
-              // cekCIF('coll_s', value[0].split(' - ')[0])
-              cekNorek('coll_s', value[0].split(' - ')[0])
+              cekCIF('coll_s', value[0].split(' - ')[3]);
+              // cekNorek('coll_s', value[0].split(' - ')[0])
             }
           }
         });
