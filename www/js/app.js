@@ -35,7 +35,8 @@ document.addEventListener('deviceready', function() {
   });
 });
 
-var site = 'http://mcollection.cloudmnm.com';
+// var site = 'http://mcollection.cloudmnm.com';
+var site = 'https://mcollection.greenjournal.id';
 // var site = 'http://mcollection.cloudmnm.com/dev';
 var ac;
 var iduser = '', idrole = '';

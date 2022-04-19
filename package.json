@@ -10,7 +10,6 @@
     "author": "Apache Cordova Team",
     "license": "Apache-2.0",
     "dependencies": {
-        "cordova-android": "^8.1.0",
         "cordova-android-support-gradle-release": "^3.0.1",
         "cordova-pdf-generator": "^2.0.8",
         "cordova-plugin-app-version": "^0.1.9",
@@ -35,5 +34,8 @@
         "platforms": [
             "android"
         ]
+    },
+    "devDependencies": {
+        "cordova-android": "^9.1.0"
     }
 }
